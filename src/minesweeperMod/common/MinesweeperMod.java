@@ -180,6 +180,11 @@ public class MinesweeperMod{
 
         config.save();// save the configuration file
 
+        blockMinesweeper = new BlockMinesweeper(blockMinesweeperID, Material.ground).setHardness(3.0F).setResistance(1.0F).setUnlocalizedName("Minesweeper Block");// .setCreativeTab(CreativeTabs.tabBlock);
+
+        itemFieldGenerator = new ItemFieldGenerator(itemFieldGeneratorID).setCreativeTab(CreativeTabs.tabTools).setUnlocalizedName("Field Generator");
+        itemMineDetector = new ItemMineDetector(itemMineDetectorID).setCreativeTab(CreativeTabs.tabTools).setUnlocalizedName("Mine Detector");
+
         proxy.registerHandlers();
         tickHandler = new MinesweeperTickHandler();
         TickRegistry.registerTickHandler(tickHandler, Side.SERVER);
@@ -187,11 +192,6 @@ public class MinesweeperMod{
 
     @EventHandler
     public void load(FMLInitializationEvent event){
-
-        blockMinesweeper = new BlockMinesweeper(blockMinesweeperID, Material.ground).setHardness(3.0F).setResistance(1.0F).setUnlocalizedName("Minesweeper Block");// .setCreativeTab(CreativeTabs.tabBlock);
-
-        itemFieldGenerator = new ItemFieldGenerator(itemFieldGeneratorID).setCreativeTab(CreativeTabs.tabTools).setUnlocalizedName("Field Generator");
-        itemMineDetector = new ItemMineDetector(itemMineDetectorID).setCreativeTab(CreativeTabs.tabTools).setUnlocalizedName("Mine Detector");
 
         gameRegisters();
         MinecraftForge.EVENT_BUS.register(new ForgeEventHandler());
