@@ -5,6 +5,7 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.gen.ChunkProviderFlat;
 import cpw.mods.fml.common.IWorldGenerator;
 
 /**
@@ -19,22 +20,23 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
 
     @Override
     public void generate(Random random, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider){
-        switch(world.provider.dimensionId){
-            case 0:
-                generateSurface(world, random, chunkX * 16, chunkZ * 16);
-                break;
-            case -1:
-                generateNether(world, random, chunkX * 16, chunkZ * 16);
-                break;
-            case 1:
-                generateEnd(world, random, chunkX * 16, chunkZ * 16);
+        if(!(chunkGenerator instanceof ChunkProviderFlat)) { //don't generate on flatworlds
+            switch(world.provider.dimensionId){
+                case 0:
+                    generateSurface(world, random, chunkX * 16, chunkZ * 16);
+                    break;
+                case -1:
+                    generateNether(world, random, chunkX * 16, chunkZ * 16);
+                    break;
+                case 1:
+                    generateEnd(world, random, chunkX * 16, chunkZ * 16);
+            }
         }
     }
 
     public void generateSurface(World world, Random rand, int chunkX, int chunkZ){
 
         if(MinesweeperMod.configHardSR != 0 && rand.nextInt(MinesweeperMod.configHardSR) == 0) {
-            if(isFlatWorld(world, chunkX, chunkZ)) return;
             int baseX = chunkX + rand.nextInt(8);
             int baseY = 7 + rand.nextInt(45);
             int baseZ = chunkZ + rand.nextInt(8);
@@ -46,7 +48,6 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
         }
 
         if(MinesweeperMod.configMediumSR != 0 && rand.nextInt(MinesweeperMod.configMediumSR) == 0) {
-            if(isFlatWorld(world, chunkX, chunkZ)) return;
             int baseX = chunkX + rand.nextInt(8);
             int baseY = 7 + rand.nextInt(45);
             int baseZ = chunkZ + rand.nextInt(8);
@@ -58,7 +59,6 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
         }
 
         if(MinesweeperMod.configEasySR != 0 && rand.nextInt(MinesweeperMod.configEasySR) == 0) {
-            if(isFlatWorld(world, chunkX, chunkZ)) return;
             int baseX = chunkX + rand.nextInt(8);
             int baseZ = chunkZ + rand.nextInt(8);
             int maxX = baseX + rand.nextInt(9) + 9;
@@ -228,20 +228,6 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
             }
         }
         return false;
-    }
-
-    private boolean isFlatWorld(World world, int baseX, int baseZ){
-        for(int i = 0; i < 100; i++) { // check 100 blocks between level 10 and
-                                       // 20, if they arent stone or netherrack,
-                                       // we are on a flatworld
-            Random rand = new Random();
-            int randX = baseX + rand.nextInt(16);
-            int randY = 10 + rand.nextInt(10);
-            int randZ = baseZ + rand.nextInt(16);
-            int blockID = world.getBlockId(randX, randY, randZ);
-            if(blockID == Block.stone.blockID || blockID == Block.netherrack.blockID) return false;
-        }
-        return true;
     }
 
     private int getDifficultyBlock(int difficulty){
