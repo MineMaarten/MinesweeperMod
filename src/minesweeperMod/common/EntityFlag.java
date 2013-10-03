@@ -39,7 +39,7 @@ public class EntityFlag extends Entity{
                 double randX = posX + (rand.nextDouble() - 0.5D) / 2D;
                 double randY = posY + rand.nextDouble() * 2D;
                 double randZ = posZ + (rand.nextDouble() - 0.5D) / 2D;
-                PacketDispatcher.sendPacketToAllPlayers(MinesweeperPacketHandler.spawnParticle("explode", randX, randY, randZ, 0, 0, 0));
+                PacketDispatcher.sendPacketToAllAround(posX, posY, posZ, 64D, worldObj.provider.dimensionId, MinesweeperPacketHandler.spawnParticle("explode", randX, randY, randZ, 0, 0, 0));
             }
         }
     }

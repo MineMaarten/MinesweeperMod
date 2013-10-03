@@ -30,7 +30,7 @@ import cpw.mods.fml.relauncher.Side;
  * @license Lesser GNU Public License v3 (http://www.gnu.org/licenses/lgpl.html)
  */
 // TODO increase version
-@Mod(modid = "Minemaarten_Minesweeper Mod", name = "Minesweeper Mod", version = "1.4.2")
+@Mod(modid = "Minemaarten_Minesweeper Mod", name = "Minesweeper Mod", version = "1.4.4")
 @NetworkMod(clientSideRequired = true, serverSideRequired = false, channels = {"minesweeper"}, packetHandler = MinesweeperPacketHandler.class)
 public class MinesweeperMod{
 

@@ -25,7 +25,7 @@ public class RenderFlag extends Render{
     }
 
     public void renderFlag(EntityFlag flag, double par2, double par4, double par6, float par8, float par9){
-        func_110777_b(flag);
+        bindEntityTexture(flag);
         GL11.glPushMatrix();
         GL11.glTranslatef((float)par2, (float)par4 + 1.5F, (float)par6);
         GL11.glScalef(1.0F, -1F, -1F);
@@ -33,13 +33,9 @@ public class RenderFlag extends Render{
         GL11.glPopMatrix();
     }
 
-    protected ResourceLocation func_110779_a(EntityFlag par1EntityFlag){
-        return texture;
-    }
-
     @Override
-    protected ResourceLocation func_110775_a(Entity par1Entity){
-        return func_110779_a((EntityFlag)par1Entity);
+    protected ResourceLocation getEntityTexture(Entity par1Entity){
+        return texture;
     }
 
     @Override
