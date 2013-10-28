@@ -5,7 +5,9 @@ import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.stats.Achievement;
 import net.minecraft.util.WeightedRandomChestContent;
+import net.minecraftforge.common.AchievementPage;
 import net.minecraftforge.common.ChestGenHooks;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
@@ -30,7 +32,7 @@ import cpw.mods.fml.relauncher.Side;
  * @license Lesser GNU Public License v3 (http://www.gnu.org/licenses/lgpl.html)
  */
 // TODO increase version
-@Mod(modid = "Minemaarten_Minesweeper Mod", name = "Minesweeper Mod", version = "1.4.4")
+@Mod(modid = "Minemaarten_Minesweeper Mod", name = "Minesweeper Mod", version = "1.4.5")
 @NetworkMod(clientSideRequired = true, serverSideRequired = false, channels = {"minesweeper"}, packetHandler = MinesweeperPacketHandler.class)
 public class MinesweeperMod{
 
@@ -39,7 +41,6 @@ public class MinesweeperMod{
 
     @Instance("Minemaarten_Minesweeper Mod")
     public static MinesweeperMod instance = new MinesweeperMod();
-    // private GuiHandlerEntityCannon guiHandler = new GuiHandlerEntityCannon();
 
     public static Block blockMinesweeper;
 
@@ -47,54 +48,6 @@ public class MinesweeperMod{
     public static Item itemMineDetector;
 
     public static MinesweeperTickHandler tickHandler;
-
-    /*
-     * public static final Achievement achieveTilesCleared1 = new
-     * Achievement(2100, "achieveCleared1", 0, -3,
-     * minesweeperMod.ItemFieldGenerator ,
-     * (Achievement)null).setIndependent().registerAchievement(); public static
-     * final Achievement achieveTilesCleared2 = new Achievement(2101,
-     * "achieveCleared2", 3, 0, new
-     * ItemStack(minesweeperMod.ItemFieldGenerator.itemID, 1,4) ,
-     * achieveTilesCleared1).registerAchievement(); public static final
-     * Achievement achieveTilesCleared3 = new Achievement(2102,
-     * "achieveCleared3", 2, 3, new
-     * ItemStack(minesweeperMod.ItemFieldGenerator.itemID, 1,4) ,
-     * achieveTilesCleared2).registerAchievement(); public static final
-     * Achievement achieveTilesCleared4 = new Achievement(2103,
-     * "achieveCleared4", -2, 3, new
-     * ItemStack(minesweeperMod.ItemFieldGenerator.itemID, 1,8) ,
-     * achieveTilesCleared3).registerAchievement(); public static final
-     * Achievement achieveTilesCleared5 = new Achievement(2104,
-     * "achieveCleared5", -3, 0, new
-     * ItemStack(minesweeperMod.ItemFieldGenerator.itemID, 1,8) ,
-     * achieveTilesCleared3).registerAchievement();
-     * 
-     * public static final Achievement achieveDifficultyCleared1 = new
-     * Achievement(2105, "achieveDifficulty1", -1, -1,
-     * minesweeperMod.ItemFieldGenerator,
-     * (Achievement)null).setIndependent().registerAchievement(); public static
-     * final Achievement achieveDifficultyCleared2 = new Achievement(2106,
-     * "achieveDifficulty2", 1, -1, new
-     * ItemStack(minesweeperMod.ItemFieldGenerator.itemID, 1,1),
-     * (Achievement)null).setIndependent().registerAchievement(); public static
-     * final Achievement achieveDifficultyCleared3 = new Achievement(2107,
-     * "achieveDifficulty3", 1, 1, new
-     * ItemStack(minesweeperMod.ItemFieldGenerator.itemID, 1,2),
-     * (Achievement)null).setIndependent().registerAchievement(); public static
-     * final Achievement achieveDifficultyCleared4 = new Achievement(2108,
-     * "achieveDifficulty4", -1, 1, new
-     * ItemStack(minesweeperMod.ItemFieldGenerator.itemID, 1,3),
-     * (Achievement)null).setIndependent().registerAchievement();
-     * 
-     * 
-     * public static AchievementPage achievementPageMinesweeper = new
-     * AchievementPage("Minesweeper", achieveTilesCleared1,
-     * achieveTilesCleared2, achieveTilesCleared3, achieveTilesCleared4,
-     * achieveTilesCleared5, achieveDifficultyCleared1,
-     * achieveDifficultyCleared2
-     * ,achieveDifficultyCleared3,achieveDifficultyCleared4);
-     */
 
     private static int blockMinesweeperID;
 
@@ -188,6 +141,7 @@ public class MinesweeperMod{
         proxy.registerHandlers();
         tickHandler = new MinesweeperTickHandler();
         TickRegistry.registerTickHandler(tickHandler, Side.SERVER);
+        achievementRegisters();
     }
 
     @EventHandler
@@ -243,56 +197,80 @@ public class MinesweeperMod{
         // worldgenerators
         GameRegistry.registerWorldGenerator(new WorldGeneratorMinesweeper());
         ChestGenHooks.getInfo(ChestGenHooks.VILLAGE_BLACKSMITH).addItem(new WeightedRandomChestContent(new ItemStack(itemFieldGenerator.itemID, 1, 101), 1, 1, 5));
-        ChestGenHooks.getInfo(ChestGenHooks.DUNGEON_CHEST).addItem(new WeightedRandomChestContent(new ItemStack(itemFieldGenerator.itemID, 1, 101), 1, 1, 100));
+        ChestGenHooks.getInfo(ChestGenHooks.DUNGEON_CHEST).addItem(new WeightedRandomChestContent(new ItemStack(itemFieldGenerator.itemID, 1, 101), 1, 1, 5));
 
         EntityRegistry.registerModEntity(EntityFlag.class, "Minesweeper Flag", 0, this, 80, 1, true);
 
     }
 
-    /*
-     * public void achievementRegisters() {
-     * 
-     * 
-     * achieveTilesCleared = new Achievement[5]; achieveDifficultyCleared = new
-     * Achievement[4];
-     * 
-     * achieveTilesCleared[0] = (new Achievement(2100, "achieveCleared1", 0, -3,
-     * minesweeperMod.ItemFieldGenerator , (Achievement)null)).setIndependent();
-     * achieveDifficultyCleared[0] = (new Achievement(2105,
-     * "achieveDifficulty1", -1, -1, minesweeperMod.ItemFieldGenerator,
-     * (Achievement)null)).setIndependent(); for(int i = 1; i < 5; i++){ int
-     * meta; int xPosTiles; int xPosDifficulty = 0; int yPosTiles; int
-     * yPosDifficulty = 0; switch(i){ case 1: xPosDifficulty = 1; yPosDifficulty
-     * = -1; xPosTiles = 3; yPosTiles = 0; meta = 4; break; case 2:
-     * xPosDifficulty = 1; yPosDifficulty = 1; xPosTiles = 2; yPosTiles = 3;
-     * meta = 4; break; case 3: xPosDifficulty = -1; yPosDifficulty = 1;
-     * xPosTiles = -2; yPosTiles = 3; meta = 8; break; default: xPosTiles = -3;
-     * yPosTiles = 0; meta = 8; }
-     * 
-     * achieveTilesCleared[i] = (new Achievement(2100 + i, "achieveCleared" + (i
-     * + 1), xPosTiles, yPosTiles, new
-     * ItemStack(minesweeperMod.ItemFieldGenerator.itemID, 1, meta),
-     * achieveTilesCleared[i - 1])); if(i < 4) achieveDifficultyCleared[i] =
-     * (new Achievement(2105 + i, "achieveDifficulty" + (i + 1), xPosDifficulty,
-     * yPosDifficulty, new ItemStack(minesweeperMod.ItemFieldGenerator.itemID,
-     * 1,i), (Achievement)null)).setIndependent();
-     * 
-     * }
-     * 
-     * for(int i = 0; i < 5; i++){ registerAchievement(achieveTilesCleared[i]);
-     * if(i < 4) registerAchievement(achieveDifficultyCleared[i]); }
-     * 
-     * 
-     * //arranging the achievement page achievementPageMinesweeper = new
-     * AchievementPage("Minesweeper", achieveTilesCleared[0],
-     * achieveTilesCleared[1], achieveTilesCleared[2], achieveTilesCleared[3],
-     * achieveTilesCleared[4], achieveDifficultyCleared[0],
-     * achieveDifficultyCleared
-     * [1],achieveDifficultyCleared[2],achieveDifficultyCleared[3]);
-     * AchievementPage.registerAchievementPage(achievementPageMinesweeper);
-     * 
-     * }
-     */
+    public void achievementRegisters(){
+
+        Achievement[] achieveTilesCleared = new Achievement[5];
+        Achievement[] achieveDifficultyCleared = new Achievement[4];
+        achieveTilesCleared[0] = new Achievement(2100, "achieveCleared1", 0, -3, itemFieldGenerator, (Achievement)null).setIndependent();
+        achieveDifficultyCleared[0] = new Achievement(2105, "achieveDifficulty1", -1, -1, itemFieldGenerator, (Achievement)null).setIndependent();
+        for(int i = 1; i < 5; i++) {
+            int meta;
+            int xPosTiles;
+            int xPosDifficulty = 0;
+            int yPosTiles;
+            int yPosDifficulty = 0;
+            switch(i){
+                case 1:
+                    xPosDifficulty = 1;
+                    yPosDifficulty = -1;
+                    xPosTiles = 3;
+                    yPosTiles = 0;
+                    meta = 4;
+                    break;
+                case 2:
+                    xPosDifficulty = 1;
+                    yPosDifficulty = 1;
+                    xPosTiles = 2;
+                    yPosTiles = 3;
+                    meta = 4;
+                    break;
+                case 3:
+                    xPosDifficulty = -1;
+                    yPosDifficulty = 1;
+                    xPosTiles = -2;
+                    yPosTiles = 3;
+                    meta = 8;
+                    break;
+                default:
+                    xPosTiles = -3;
+                    yPosTiles = 0;
+                    meta = 8;
+            }
+
+            achieveTilesCleared[i] = new Achievement(2100 + i, "achieveCleared" + (i + 1), xPosTiles, yPosTiles, new ItemStack(itemFieldGenerator.itemID, 1, meta), achieveTilesCleared[i - 1]).setIndependent();
+            if(i < 4) achieveDifficultyCleared[i] = new Achievement(2105 + i, "achieveDifficulty" + (i + 1), xPosDifficulty, yPosDifficulty, new ItemStack(itemFieldGenerator.itemID, 1, i), (Achievement)null).setIndependent();
+
+        }
+
+        //arranging the achievement page 
+        Achievement[] allAchieves = new Achievement[achieveTilesCleared.length + achieveDifficultyCleared.length + 5];
+        for(int i = 0; i < achieveTilesCleared.length; i++) {
+            allAchieves[i] = achieveTilesCleared[i];
+        }
+        for(int i = 0; i < achieveDifficultyCleared.length; i++) {
+            allAchieves[i + achieveTilesCleared.length] = achieveDifficultyCleared[i];
+        }
+
+        allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length] = new Achievement(2109, "achieveTutorial", -5, -3, new ItemStack(itemFieldGenerator, 1, 100), (Achievement)null).setIndependent();
+        allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length + 1] = new Achievement(2110, "achieveAdvancedTutorial", -5, -1, new ItemStack(itemFieldGenerator, 1, 101), allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length]).setIndependent();
+
+        allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length + 2] = new Achievement(2111, "achieveUseDetector", -5, 2, itemMineDetector, (Achievement)null).setIndependent();
+        allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length + 3] = new Achievement(2112, "achieve8", 5, -3, new ItemStack(blockMinesweeper, 1, 8), (Achievement)null).setSpecial().setIndependent();
+        allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length + 4] = new Achievement(2113, "achieve7", 5, -1, new ItemStack(blockMinesweeper, 1, 7), (Achievement)null).setSpecial().setIndependent();
+
+        for(Achievement achieve : allAchieves) {
+            achieve.registerAchievement();
+        }
+
+        AchievementPage.registerAchievementPage(new AchievementPage("Minesweeper", allAchieves));
+
+    }
 
     public void languageRegisters(){
         LanguageRegistry.addName(blockMinesweeper, "Minesweeper Block");
@@ -307,38 +285,46 @@ public class MinesweeperMod{
         LanguageRegistry.addName(new ItemStack(itemFieldGenerator, 1, 101), "Advanced Tutorial Generator");
         LanguageRegistry.instance().addStringLocalization("entity.Minemaarten_Minesweeper Mod.Minesweeper Flag.name", "Minesweeper Flag");
 
-        /*
-         * this.addAchievementName("achieveCleared1", "Planting The Flag");
-         * this.addAchievementName("achieveCleared2", "A Bigger Challenge");
-         * this.addAchievementName("achieveCleared3", "Mining As A Daily Job");
-         * this.addAchievementName("achieveCleared4", "No-Life");
-         * this.addAchievementName("achieveCleared5", "Unnecessary Risk");
-         * this.addAchievementDesc("achieveCleared1",
-         * "Clear a minefield existing out of more than 50 tiles.");
-         * this.addAchievementDesc("achieveCleared2",
-         * "Clear a minefield existing out of more than 100 tiles.");
-         * this.addAchievementDesc("achieveCleared3",
-         * "Clear a minefield existing out of more than 200 tiles.");
-         * this.addAchievementDesc("achieveCleared4",
-         * "Clear a minefield existing out of more than 500 tiles.");
-         * this.addAchievementDesc("achieveCleared5",
-         * "Clear a minefield existing out of more than 1000 tiles.");
-         * 
-         * this.addAchievementName("achieveDifficulty1", "Peanuts");
-         * this.addAchievementName("achieveDifficulty2",
-         * "Working On The Field");
-         * this.addAchievementName("achieveDifficulty3",
-         * "Blowing Your Socks Off");
-         * this.addAchievementName("achieveDifficulty4", "Taking A High Risk");
-         * this.addAchievementDesc("achieveDifficulty1",
-         * "Clear an easy minefield existing out of more than 50 tiles.");
-         * this.addAchievementDesc("achieveDifficulty2",
-         * "Clear a normal minefield existing out of more than 50 tiles.");
-         * this.addAchievementDesc("achieveDifficulty3",
-         * "Clear a hard minefield existing out of more than 50 tiles.");
-         * this.addAchievementDesc("achieveDifficulty4",
-         * "Clear a hardcore minefield existing out of more than 50 tiles.");
-         */
+        addAchievementName("achieveCleared1", "Planting The Flag");
+        addAchievementName("achieveCleared2", "A Bigger Challenge");
+        addAchievementName("achieveCleared3", "Mining As A Daily Job");
+        addAchievementName("achieveCleared4", "No-Life");
+        addAchievementName("achieveCleared5", "Unnecessary Risk");
+        addAchievementDesc("achieveCleared1", "Clear a minefield existing out of more than 50 tiles.");
+        addAchievementDesc("achieveCleared2", "Clear a minefield existing out of more than 100 tiles.");
+        addAchievementDesc("achieveCleared3", "Clear a minefield existing out of more than 200 tiles.");
+        addAchievementDesc("achieveCleared4", "Clear a minefield existing out of more than 500 tiles.");
+        addAchievementDesc("achieveCleared5", "Clear a minefield existing out of more than 1000 tiles.");
+
+        addAchievementName("achieveDifficulty1", "Peanuts");
+        addAchievementName("achieveDifficulty2", "Working On The Field");
+        addAchievementName("achieveDifficulty3", "Blowing Your Socks Off");
+        addAchievementName("achieveDifficulty4", "Taking A High Risk");
+        addAchievementDesc("achieveDifficulty1", "Clear an easy minefield existing out of more than 50 tiles.");
+        addAchievementDesc("achieveDifficulty2", "Clear a normal minefield existing out of more than 50 tiles.");
+        addAchievementDesc("achieveDifficulty3", "Clear a hard minefield existing out of more than 50 tiles.");
+        addAchievementDesc("achieveDifficulty4", "Clear a hardcore minefield existing out of more than 50 tiles.");
+
+        addAchievementName("achieveTutorial", "Started From Scratch");
+        addAchievementDesc("achieveTutorial", "Complete the Minesweeper Tutorial.");
+        addAchievementName("achieveAdvancedTutorial", "Advancing");
+        addAchievementDesc("achieveAdvancedTutorial", "Complete the Advanced Minesweeper Tutorial.");
+
+        addAchievementName("achieveUseDetector", "Safety First");
+        addAchievementDesc("achieveUseDetector", "Use the Mine Detector");
+
+        addAchievementName("achieve8", "An EIGHT??!");
+        addAchievementDesc("achieve8", "Find an 8.");
+        addAchievementName("achieve7", "Uncommon Find");
+        addAchievementDesc("achieve7", "Find a 7.");
+    }
+
+    private void addAchievementName(String ach, String name){
+        LanguageRegistry.instance().addStringLocalization("achievement." + ach, "en_US", name);
+    }
+
+    private void addAchievementDesc(String ach, String desc){
+        LanguageRegistry.instance().addStringLocalization("achievement." + ach + ".desc", "en_US", desc);
     }
 
 }

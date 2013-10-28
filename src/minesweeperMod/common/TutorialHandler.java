@@ -6,6 +6,8 @@ import minesweeperMod.client.MinesweeperDrawBlockHighlightHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
+import cpw.mods.fml.common.network.PacketDispatcher;
+import cpw.mods.fml.common.network.Player;
 
 /**
  * Minesweeper Mod
@@ -193,6 +195,7 @@ public class TutorialHandler{
                 break;
             case 16:
                 sendChatToNearbyPlayers("\u00a7B[Tutorial] Well done! You've finished this tutorial!");
+                addAchievementToNearbyPlayers("achieveAdvancedTutorial");
                 return false;
         }
         return true;
@@ -287,6 +290,7 @@ public class TutorialHandler{
                 timer++;
                 switch(timer){
                     case 1:
+                        addAchievementToNearbyPlayers("achieveTutorial");
                         sendChatToNearbyPlayers("\u00a7B[Tutorial] \u00a72Well done! You've succesfully completed this minefield!\u00a7B As you can see, every busted mine in the field drops some experience. (...)");
                         break;
                     case 120:
@@ -360,4 +364,11 @@ public class TutorialHandler{
         }
     }
 
+    private void addAchievementToNearbyPlayers(String achievementName){
+        AxisAlignedBB bbBox = AxisAlignedBB.getAABBPool().getAABB(baseX - 5, baseY - 5, baseZ - 5, baseX + 13, baseY + 8, baseZ + 13);
+        List<EntityPlayer> players = world.getEntitiesWithinAABB(EntityPlayer.class, bbBox);
+        for(int i = 0; i < players.size(); i++) {
+            PacketDispatcher.sendPacketToPlayer(MinesweeperPacketHandler.getAchievementPacket(achievementName), (Player)players.get(i));
+        }
+    }
 }

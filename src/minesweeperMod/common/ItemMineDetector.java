@@ -26,6 +26,9 @@ public class ItemMineDetector extends Item{
     @Override
     public boolean onItemUse(ItemStack IStack, EntityPlayer player, World world, int x, int y, int z, int par7, float par8, float par9, float par10){
         if(world.getBlockId(x, y, z) == MinesweeperMod.blockMinesweeper.blockID) {
+            if(world.isRemote) {
+                player.addStat(MinesweeperUtils.getAchieveFromName("achieveUseDetector"), 1);
+            }
             int meta = world.getBlockMetadata(x, y, z);
             if(MinesweeperUtils.isTileBomb(meta)) {
                 world.playSoundEffect(x, y, z, "minesweepermod:minebeep", 1.0F, 1.0F);

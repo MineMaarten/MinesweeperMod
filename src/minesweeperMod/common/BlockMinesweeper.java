@@ -16,6 +16,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
 import cpw.mods.fml.common.network.PacketDispatcher;
+import cpw.mods.fml.common.network.Player;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -96,10 +97,10 @@ public class BlockMinesweeper extends Block{
         }
         int meta = world.getBlockMetadata(x, y, z);
         if(MinesweeperUtils.isTileClosed(meta)) {
-            openTile(world, x, y, z);
+            openTile(world, x, y, z, player);
         } else {
             if(getSurroundingFlags(world, x, y, z) == meta) {// when the amount of flags is the same as the number of bombs around the clicked block, we should be able to open every other tile surrounding this one.
-                openSurroundingNonFlags(world, x, y, z);
+                openSurroundingNonFlags(world, x, y, z, player);
             }
         }
         if(isGameDoneAndReward(world, x, y, z, player)) {
@@ -107,15 +108,20 @@ public class BlockMinesweeper extends Block{
         }
     }
 
-    private void openTile(World world, int x, int y, int z){
+    private void openTile(World world, int x, int y, int z, EntityPlayer player){
         if(MinesweeperUtils.isTileBomb(world.getBlockMetadata(x, y, z))) {
             eraseField(world, x, y, z, true);
             if(!world.isRemote) world.createExplosion(null, (double)x + 0.5F, (double)y + 1.5F, (double)z + 0.5F, EXPLOSION_RADIUS, true);
         } else {
             int bombCount = getSurroundingBombs(world, x, y, z);
+            if(bombCount == 7) {
+                giveAchievement(world, player, "achieve7");
+            } else if(bombCount == 8) {
+                giveAchievement(world, player, "achieve8");
+            }
             setBlockMetadata(world, x, y, z, bombCount);
             if(bombCount == 0 && !world.isRemote) {
-                openSurroundingNonFlags(world, x, y, z);
+                openSurroundingNonFlags(world, x, y, z, player);
             }
         }
     }
@@ -144,11 +150,11 @@ public class BlockMinesweeper extends Block{
         return flagCount;
     }
 
-    private void openSurroundingNonFlags(World world, int x, int y, int z){
+    private void openSurroundingNonFlags(World world, int x, int y, int z, EntityPlayer player){
         for(int i = x - 1; i <= x + 1; i++) {
             for(int j = z - 1; j <= z + 1; j++) {
                 if(world.getBlockId(i, y, j) == blockID && !MinesweeperUtils.isTileFlagged(world.getBlockMetadata(i, y, j)) && MinesweeperUtils.isTileClosed(world.getBlockMetadata(i, y, j))) {
-                    openTile(world, i, y, j);
+                    openTile(world, i, y, j, player);
                 }
             }
         }
@@ -171,91 +177,91 @@ public class BlockMinesweeper extends Block{
             if(MinesweeperUtils.isTileHardcoreBomb(neighMeta)) hardcoreBombCount++;
         }
 
-        if(tileCount > 50) giveAchievement(world, player, 0);
+        if(tileCount > 50) giveAchievement(world, player, "achieveCleared1");
         else return true;
-        if(tileCount > 100) giveAchievement(world, player, 1);
-        if(tileCount > 200) giveAchievement(world, player, 2);
-        if(tileCount > 500) giveAchievement(world, player, 3);
-        if(tileCount > 1000) giveAchievement(world, player, 4);
+        if(tileCount > 100) giveAchievement(world, player, "achieveCleared2");
+        if(tileCount > 200) giveAchievement(world, player, "achieveCleared3");
+        if(tileCount > 500) giveAchievement(world, player, "achieveCleared4");
+        if(tileCount > 1000) giveAchievement(world, player, "achieveCleared5");
 
         // reward the player depending on how many tiles have been cleared.
-        if(!world.isRemote) {
-            int itemID = 0;
-            int itemAmount = 1; // drop default one item.
-            int itemDamage = 0;
-            double tileBombRatio = (double)bombCount / (double)tileCount;
-            double hardcoreBombPercentage = (double)hardcoreBombCount / (double)bombCount;
-            // TODO improve rewards
-            if(tileBombRatio > 1D / 6D && hardcoreBombPercentage > 0.5D) {
-                // hardcore rewards:
-                giveAchievement(world, player, 8);
-                if(tileCount > 500) {
-                    itemID = Item.netherStar.itemID;
-                } else if(tileCount > 300) {
-                    itemID = Block.blockEmerald.blockID;
-                } else if(tileCount > 200) {
-                    itemID = Block.blockDiamond.blockID;
-                } else if(tileCount > 100) {
-                    itemID = Block.blockGold.blockID;
-                } else if(tileCount > 50) {
-                    itemID = Block.blockIron.blockID;
-                } else {
-                    return true;
-                }
-            } else if(tileBombRatio > 1D / 6D) {
-                // hard rewards:
-                giveAchievement(world, player, 7);
-                itemAmount = rand.nextInt(3) + 3;// 3 to 5 drops
-                if(tileCount > 500) {
-                    itemID = Item.skull.itemID;
-                    itemDamage = 1;
-                    itemAmount = 1; // one skull drop per.
-                } else if(tileCount > 300) {
-                    itemID = Item.emerald.itemID;
-                } else if(tileCount > 200) {
-                    itemID = Item.diamond.itemID;
-                } else if(tileCount > 100) {
-                    itemID = Block.glowStone.blockID;
-                } else if(tileCount > 50) {
-                    itemID = Item.glowstone.itemID;
-                } else {
-                    return true;
-                }
-            } else if(tileBombRatio > 1D / 8D) {
-                // normal rewards:
-                giveAchievement(world, player, 6);
-                itemAmount = rand.nextInt(3) + 3;// 3 to 5 drops
-                if(tileCount > 500) {
-                    itemID = Item.emerald.itemID;
-                } else if(tileCount > 300) {
-                    itemID = Item.diamond.itemID;
-                } else if(tileCount > 200) {
-                    itemID = Item.glowstone.itemID;
-                } else if(tileCount > 100) {
-                    itemID = Item.redstone.itemID;
-                } else if(tileCount > 50) {
-                    itemID = Item.ingotGold.itemID;
-                } else {
-                    return true;
-                }
+        int itemID = 0;
+        int itemAmount = 1; // drop default one item.
+        int itemDamage = 0;
+        double tileBombRatio = (double)bombCount / (double)tileCount;
+        double hardcoreBombPercentage = (double)hardcoreBombCount / (double)bombCount;
+        // TODO improve rewards
+        if(tileBombRatio > 1D / 6D && hardcoreBombPercentage > 0.5D) {
+            // hardcore rewards:
+            giveAchievement(world, player, "achieveDifficulty4");
+            if(tileCount > 500) {
+                itemID = Item.netherStar.itemID;
+            } else if(tileCount > 300) {
+                itemID = Block.blockEmerald.blockID;
+            } else if(tileCount > 200) {
+                itemID = Block.blockDiamond.blockID;
+            } else if(tileCount > 100) {
+                itemID = Block.blockGold.blockID;
+            } else if(tileCount > 50) {
+                itemID = Block.blockIron.blockID;
             } else {
-                // easy rewards:
-                giveAchievement(world, player, 5);
-                itemAmount = rand.nextInt(3) + 1; // 1 to 3 drops
-                if(tileCount > 500) {
-                    itemID = Item.diamond.itemID;
-                } else if(tileCount > 300) {
-                    itemID = Item.glowstone.itemID;
-                } else if(tileCount > 200) {
-                    itemID = Item.redstone.itemID;
-                } else if(tileCount > 100) {
-                    itemID = Item.ingotGold.itemID;
-                } else if(tileCount > 50) {
-                    itemID = Item.ingotIron.itemID;
-                } else {
-                    return true;
-                }
+                return true;
             }
+        } else if(tileBombRatio > 1D / 6D) {
+            // hard rewards:
+            giveAchievement(world, player, "achieveDifficulty3");
+            itemAmount = rand.nextInt(3) + 3;// 3 to 5 drops
+            if(tileCount > 500) {
+                itemID = Item.skull.itemID;
+                itemDamage = 1;
+                itemAmount = 1; // one skull drop per.
+            } else if(tileCount > 300) {
+                itemID = Item.emerald.itemID;
+            } else if(tileCount > 200) {
+                itemID = Item.diamond.itemID;
+            } else if(tileCount > 100) {
+                itemID = Block.glowStone.blockID;
+            } else if(tileCount > 50) {
+                itemID = Item.glowstone.itemID;
+            } else {
+                return true;
+            }
+        } else if(tileBombRatio > 1D / 8D) {
+            // normal rewards:
+            giveAchievement(world, player, "achieveDifficulty2");
+            itemAmount = rand.nextInt(3) + 3;// 3 to 5 drops
+            if(tileCount > 500) {
+                itemID = Item.emerald.itemID;
+            } else if(tileCount > 300) {
+                itemID = Item.diamond.itemID;
+            } else if(tileCount > 200) {
+                itemID = Item.glowstone.itemID;
+            } else if(tileCount > 100) {
+                itemID = Item.redstone.itemID;
+            } else if(tileCount > 50) {
+                itemID = Item.ingotGold.itemID;
+            } else {
+                return true;
+            }
+        } else {
+            // easy rewards:
+            giveAchievement(world, player, "achieveDifficulty1");
+            itemAmount = rand.nextInt(3) + 1; // 1 to 3 drops
+            if(tileCount > 500) {
+                itemID = Item.diamond.itemID;
+            } else if(tileCount > 300) {
+                itemID = Item.glowstone.itemID;
+            } else if(tileCount > 200) {
+                itemID = Item.redstone.itemID;
+            } else if(tileCount > 100) {
+                itemID = Item.ingotGold.itemID;
+            } else if(tileCount > 50) {
+                itemID = Item.ingotIron.itemID;
+            } else {
+                return true;
+            }
+        }
+        if(!world.isRemote) {
             ItemStack iStack = new ItemStack(itemID, itemAmount, itemDamage);
 
             float var6 = 0.7F;
@@ -346,28 +352,10 @@ public class BlockMinesweeper extends Block{
         world.setBlock(x, y, z, blockID, metadata, 3);
     }
 
-    public void giveAchievement(World world, EntityPlayer player, int achievement){
-        /*
-         * if(!world.isRemote){ //give the achieve serverside
-         * 
-         * switch(achievement){ case 0:
-         * player.addStat(minesweeperMod.achieveTilesCleared1, 1); break; case
-         * 1: player.addStat(minesweeperMod.achieveTilesCleared2, 1); break;
-         * case 2: player.addStat(minesweeperMod.achieveTilesCleared3, 1);
-         * break; case 3: player.addStat(minesweeperMod.achieveTilesCleared4,
-         * 1); break; case 4:
-         * player.addStat(minesweeperMod.achieveTilesCleared5, 1); break; case
-         * 5: player.addStat(minesweeperMod.achieveDifficultyCleared1, 1);
-         * break; case 6:
-         * player.addStat(minesweeperMod.achieveDifficultyCleared2, 1); break;
-         * case 7: player.addStat(minesweeperMod.achieveDifficultyCleared3, 1);
-         * break; case 8:
-         * player.addStat(minesweeperMod.achieveDifficultyCleared4, 1); break; }
-         * 
-         * //and give it client side by sending a packet. Packet packet =
-         * minesweeperPacketHandler.getAchievementPacket(achievement);
-         * PacketDispatcher.sendPacketToPlayer(packet, (Player)player); }
-         */
+    public void giveAchievement(World world, EntityPlayer player, String achievement){
+        if(!world.isRemote) {
+            PacketDispatcher.sendPacketToPlayer(MinesweeperPacketHandler.getAchievementPacket(achievement), (Player)player);
+        }
     }
 
 }

@@ -1,5 +1,10 @@
 package minesweeperMod.common;
 
+import java.util.List;
+
+import net.minecraft.stats.Achievement;
+import net.minecraft.stats.AchievementList;
+
 /**
  * Minesweeper Mod
  * @author MineMaarten
@@ -13,8 +18,6 @@ public class MinesweeperUtils{
     }
 
     public static boolean isTileBomb(int meta){
-        // if you update this method, also update the duplicate method in the
-        // ItemMineDetector class.
         return meta == 11 || meta == 12 || meta == 13 || meta == 14 || meta == 15;
     }
 
@@ -24,5 +27,19 @@ public class MinesweeperUtils{
 
     public static boolean isTileFlagged(int meta){
         return meta == 10 || meta == 13 || meta == 15;
+    }
+
+    /**
+     * 
+     * @param unlocalizedName achieve.<unlocalizedName>. this means you shouldn't include the achieve.
+     * @return
+     */
+    public static Achievement getAchieveFromName(String unlocalizedName){
+        for(Achievement achieve : (List<Achievement>)AchievementList.achievementList) {
+            if(achieve.getName().equals("achievement." + unlocalizedName)) {
+                return achieve;
+            }
+        }
+        return null;
     }
 }

@@ -14,7 +14,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
 
 public class ForgeEventHandler{
     /**
-     * Used to open a Minesweeper block in creative, even when the player is holding a sword.
+     * Used to open a Minesweeper block in creative, when the player is holding a sword.
      * @param event
      */
     @ForgeSubscribe

@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.Packet250CustomPayload;
@@ -33,30 +34,7 @@ public class MinesweeperPacketHandler implements IPacketHandler{
         int packetID = dat.readInt();
         switch(packetID){
             case GIVE_ACHIEVEMENT_ID:
-                /*
-                int achievement = dat.readInt();
-                EntityPlayer entityPlayer = (EntityPlayer)player;
-                
-                 * switch(achievement){ case 0:
-                 * entityPlayer.addStat(minesweeperMod.achieveTilesCleared1, 1);
-                 * break; case 1:
-                 * entityPlayer.addStat(minesweeperMod.achieveTilesCleared2, 1);
-                 * break; case 2:
-                 * entityPlayer.addStat(minesweeperMod.achieveTilesCleared3, 1);
-                 * break; case 3:
-                 * entityPlayer.addStat(minesweeperMod.achieveTilesCleared4, 1);
-                 * break; case 4:
-                 * entityPlayer.addStat(minesweeperMod.achieveTilesCleared5, 1);
-                 * break; case 5:
-                 * entityPlayer.addStat(minesweeperMod.achieveDifficultyCleared1
-                 * , 1); break; case 6:
-                 * entityPlayer.addStat(minesweeperMod.achieveDifficultyCleared2
-                 * , 1); break; case 7:
-                 * entityPlayer.addStat(minesweeperMod.achieveDifficultyCleared3
-                 * , 1); break; case 8:
-                 * entityPlayer.addStat(minesweeperMod.achieveDifficultyCleared4
-                 * , 1); break; }
-                 */
+                ((EntityPlayer)player).addStat(MinesweeperUtils.getAchieveFromName(dat.readUTF()), 1);
                 break;
             case SPAWN_PARTICLE_ID:
                 world.spawnParticle(dat.readUTF(), dat.readDouble(), dat.readDouble(), dat.readDouble(), dat.readDouble(), dat.readDouble(), dat.readDouble());
@@ -64,12 +42,12 @@ public class MinesweeperPacketHandler implements IPacketHandler{
         }
     }
 
-    public static Packet getAchievementPacket(int achievement){
+    public static Packet getAchievementPacket(String achievement){
         ByteArrayOutputStream bos = new ByteArrayOutputStream(140);
         DataOutputStream dos = new DataOutputStream(bos);
         try {
             dos.writeInt(GIVE_ACHIEVEMENT_ID);
-            dos.writeInt(achievement);
+            dos.writeUTF(achievement);
         } catch(IOException e) {}
         Packet250CustomPayload pkt = new Packet250CustomPayload();
         pkt.channel = "minesweeper";
