@@ -1,20 +1,5 @@
 package minesweeperMod.common;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.network.INetworkManager;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.Packet250CustomPayload;
-import net.minecraft.world.World;
-
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteStreams;
-
-import cpw.mods.fml.common.network.IPacketHandler;
-import cpw.mods.fml.common.network.Player;
 
 /**
  * Minesweeper Mod
@@ -23,7 +8,7 @@ import cpw.mods.fml.common.network.Player;
  * @license Lesser GNU Public License v3 (http://www.gnu.org/licenses/lgpl.html)
  */
 
-public class MinesweeperPacketHandler implements IPacketHandler{
+/*public class MinesweeperPacketHandler implements IPacketHandler{
     private static final int GIVE_ACHIEVEMENT_ID = 0;
     private static final int SPAWN_PARTICLE_ID = 1;
 
@@ -77,4 +62,4 @@ public class MinesweeperPacketHandler implements IPacketHandler{
         pkt.isChunkDataPacket = true;
         return pkt;
     }
-}
+}*/

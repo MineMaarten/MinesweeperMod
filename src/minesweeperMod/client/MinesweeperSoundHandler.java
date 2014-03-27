@@ -1,7 +1,7 @@
 package minesweeperMod.client;
 
 import net.minecraftforge.client.event.sound.SoundLoadEvent;
-import net.minecraftforge.event.ForgeSubscribe;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 /**
  * Minesweeper Mod
@@ -11,10 +11,10 @@ import net.minecraftforge.event.ForgeSubscribe;
  */
 
 public class MinesweeperSoundHandler{
-    @ForgeSubscribe
+    @SubscribeEvent
     public void onSound(SoundLoadEvent event){
         try {
-            event.manager.soundPoolSounds.addSound("minesweepermod:minebeep.ogg");
+            //        event.manager.soundPoolSounds.addSound("minesweepermod:minebeep.ogg");
         } catch(Exception e) {
             System.err.println("Failed to register one or more sounds.");
         }

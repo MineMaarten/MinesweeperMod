@@ -31,15 +31,15 @@ public class MinesweeperUtils{
 
     /**
      * 
-     * @param unlocalizedName achieve.<unlocalizedName>. this means you shouldn't include the achieve.
+     * @param name achieve.<unlocalizedName>. this means you shouldn't include the achieve.
      * @return
      */
-    public static Achievement getAchieveFromName(String unlocalizedName){
+    public static Achievement getAchieveFromName(String name){
         for(Achievement achieve : (List<Achievement>)AchievementList.achievementList) {
-            if(achieve.getName().equals("achievement." + unlocalizedName)) {
+            if(achieve.statId.equals(name)) {
                 return achieve;
             }
         }
-        return null;
+        throw new IllegalArgumentException("[Minesweeper Mod] Achievement not found! id: " + name);
     }
 }

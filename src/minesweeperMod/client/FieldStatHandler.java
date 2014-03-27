@@ -1,12 +1,11 @@
 package minesweeperMod.client;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 
 import minesweeperMod.common.BlockMinesweeper;
-import minesweeperMod.common.MinesweeperUtils;
 import minesweeperMod.common.MinesweeperMod;
+import minesweeperMod.common.MinesweeperUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,8 +14,8 @@ import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
 
 import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.ITickHandler;
-import cpw.mods.fml.common.TickType;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -28,7 +27,7 @@ import cpw.mods.fml.relauncher.SideOnly;
  */
 
 @SideOnly(Side.CLIENT)
-public class FieldStatHandler implements ITickHandler{
+public class FieldStatHandler{
     public static int x;//coords of the last clicked minesweeper tile.
     public static int y;
     public static int z;
@@ -42,14 +41,9 @@ public class FieldStatHandler implements ITickHandler{
     private boolean isTriggeredThisTick;
     private GuiAnimatedStat minesweeperStat;
 
-    @Override
-    public void tickStart(EnumSet<TickType> type, Object... tickData){
-
-    }
-
-    @Override
-    public void tickEnd(EnumSet<TickType> type, Object... tickData){
-        if(type.contains(TickType.RENDER) && MinesweeperMod.instance.configStatEnabled) {
+    @SubscribeEvent
+    public void tickEnd(TickEvent.RenderTickEvent event){
+        if(MinesweeperMod.instance.configStatEnabled) {
             Minecraft minecraft = FMLClientHandler.instance().getClient();
             EntityPlayer player = minecraft.thePlayer;
             if(player != null) {
@@ -74,7 +68,7 @@ public class FieldStatHandler implements ITickHandler{
                     minesweeperStat.setMinDimensionsAndReset(0, 0);
                 }
                 List<String> textList = new ArrayList<String>();
-                if(world.getBlockId(x, y, z) == MinesweeperMod.blockMinesweeper.blockID) {
+                if(world.getBlock(x, y, z) == MinesweeperMod.blockMinesweeper) {
                     minesweeperStat.openWindow();
                     if(shouldUpdate || forceUpdate) {
                         List<int[]> tiles = new ArrayList<int[]>();
@@ -154,16 +148,6 @@ public class FieldStatHandler implements ITickHandler{
                 GL11.glEnable(GL11.GL_TEXTURE_2D);
             }
         }
-    }
-
-    @Override
-    public EnumSet<TickType> ticks(){
-        return EnumSet.of(TickType.RENDER);
-    }
-
-    @Override
-    public String getLabel(){
-        return "Minesweeper Mod Field Stat Handler";
     }
 
 }

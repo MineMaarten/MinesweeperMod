@@ -1,0 +1,98 @@
+﻿#Blocks
+tile.minesweeperBlock.name=Minesweeper Block
+
+#Items
+item.mineDetector.name=Mine Detector
+item.fieldGenerator.tutorial.name=Tutorial Field Generator
+item.fieldGenerator.advancedTutorial.name=Advanced Tutorial Field Generator
+item.fieldGenerator.smallEasy.name=Small Easy Field Generator
+item.fieldGenerator.smallNormal.name=Small Normal Field Generator
+item.fieldGenerator.smallHard.name=Small Hard Field Generator
+item.fieldGenerator.smallHardcore.name=Small Hardcore Field Generator
+item.fieldGenerator.mediumEasy.name=Medium Easy Field Generator
+item.fieldGenerator.mediumNormal.name=Medium Normal Field Generator
+item.fieldGenerator.mediumHard.name=Medium Hard Field Generator
+item.fieldGenerator.mediumHardcore.name=Medium Hardcore Field Generator
+item.fieldGenerator.bigEasy.name=Big Easy Field Generator
+item.fieldGenerator.bigNormal.name=Big Normal Field Generator
+item.fieldGenerator.bigHard.name=Big Hard Field Generator
+item.fieldGenerator.bigHardcore.name=Big Hardcore Field Generator
+
+#item tooltips
+item.fieldGenerator.tooltip.easy=§eEasy: 1 bomb per 10 tiles average
+item.fieldGenerator.tooltip.normal=§6Normal: 1 bomb per 7 tiles average
+item.fieldGenerator.tooltip.hard=§cHard: 1 bomb per 5 tiles average
+item.fieldGenerator.tooltip.hardcore=§4Hardcore: 1 bomb per 5 tiles average,
+item.fieldGenerator.tooltip.hardcore2=§4all mines explode on failure
+item.fieldGenerator.tooltip.small=§fSmall: 10x10
+item.fieldGenerator.tooltip.medium=§8Medium: 20x20
+item.fieldGenerator.tooltip.big=§cBig: 40x40
+
+#Entities
+entity.MinesweeperMod.minesweeperFlag.name=Minesweeper Flag
+
+# Achievements
+achievement.achieveCleared1=Planting The Flag
+achievement.achieveCleared2=A Bigger Challenge
+achievement.achieveCleared3=Mining As A Daily Job
+achievement.achieveCleared4=No-Life
+achievement.achieveCleared5=Unnecessary Risk
+achievement.achieveCleared1.desc=Clear a minefield existing out of more than 50 tiles.
+achievement.achieveCleared2.desc=Clear a minefield existing out of more than 100 tiles.
+achievement.achieveCleared3.desc=Clear a minefield existing out of more than 200 tiles.
+achievement.achieveCleared4.desc=Clear a minefield existing out of more than 500 tiles.
+achievement.achieveCleared5.desc=Clear a minefield existing out of more than 1000 tiles.
+
+achievement.achieveDifficulty1=Peanuts
+achievement.achieveDifficulty2=Working On The Field
+achievement.achieveDifficulty3=Blowing Your Socks Off
+achievement.achieveDifficulty4=Taking A High Risk
+achievement.achieveDifficulty1.desc=Clear an easy minefield existing out of more than 50 tiles.
+achievement.achieveDifficulty2.desc=Clear a normal minefield existing out of more than 50 tiles.
+achievement.achieveDifficulty3.desc=Clear a hard minefield existing out of more than 50 tiles.
+achievement.achieveDifficulty4.desc=Clear a hardcore minefield existing out of more than 50 tiles.
+
+achievement.achieveTutorial=Started From Scratch
+achievement.achieveTutorial.desc=Complete the Minesweeper Tutorial.
+achievement.achieveAdvancedTutorial=Advancing
+achievement.achieveAdvancedTutorial.desc=Complete the Advanced Minesweeper Tutorial.
+
+achievement.achieveUseDetector=Safety First
+achievement.achieveUseDetector.desc=Use the Mine Detector.
+achievement.achieve8=An EIGHT??!
+achievement.achieve8.desc=Find an 8.
+achievement.achieve7=Uncommon Find
+achievement.achieve7.desc=Find a 7.
+
+#Tutorials
+tutorialFail=§C[Tutorial] Whoops, you've blown it! This is what happens when you find a mine.
+
+tutorial.dialog1=§B[Tutorial] Welcome to the Minesweeper Mod tutorial. These tiles you've generated here form a minefield. The goal of the game is to find all the mines in this field. (...)
+tutorial.dialog2=§B[Tutorial] To do this you will first have to guess. Click on one of the §2green highlighed tiles.
+tutorial.dialog3=§B[Tutorial] Good job! You haven't blown up! What you see now here are open tiles, and some are numbered. These numbers tell you how many mines there are around the tile. (...)
+tutorial.dialog4=§B[Tutorial] For instance, look at §1the number marked blue. §BIt is a one, which means there is exactly one mine in §Ethe area around this mine.§B (...)
+tutorial.dialog5=§B[Tutorial] As §Ethis area§B only contains one closed tile, this tile has to contain the mine. Right click on this tile to flag it as a mine.
+tutorial.dialog6=§B[Tutorial] Well done! Now you've marked this mine, you now can use §1the number highlighted here.§B There is one mine around this number... You've already found this mine. Therefore, you know §2the green highlighed tile§B isn't a mine. left-click on this tile to verify this.
+tutorial.dialog7=§B[Tutorial] Amazing! With this in mind, try to solve the rest of the minefield, will ya?
+tutorial.dialog8=§B[Tutorial] §2Well done! You've succesfully completed this minefield!§B As you can see, every busted mine in the field drops some experience. (...)
+tutorial.dialog9=§B[Tutorial] Also normally, when you clear a minefield, you'll get a reward for doing so. (...)
+tutorial.dialog10=§B[Tutorial] The value and amount of the reward depends on the difficulty of the minefield and the amount of tiles the minefield existed out of. (...)
+tutorial.dialog11=§B[Tutorial] Minefields can be found in the world. You can also craft them by yourself by taking three pieces of wool (§Eyellow/§6orange/§Cred/§8brown§B), three pieces of sticks and crafting them together in a flag pattern. (...)
+tutorial.dialog12=§B[Tutorial] These generators can be increased in size by placing four of the same type in a crafting grid. (...)
+tutorial.dialog13=§B[Tutorial] This is the end of the tutorial! Good luck sweeping! To read this information back, go to the main forum post of the Minesweeper Mod (http://www.minecraftforum.net/topic/1708118-151forgesspsmp-minesweeper-mod/).
+
+advancedTutorial.dialog1=§B[Tutorial] Welcome to the Advanced Minesweeper Mod tutorial. This tutorial is about tips & tricks you might not have thought about when you were sweeping mines. Let's dive into it!(...)
+advancedTutorial.dialog2=§B[Tutorial] Open one of the §2selected tiles.
+advancedTutorial.dialog3=§B[Tutorial] Good. Now, with only the basics you wouldn't be able to solve this field. However, you can solve this field with some tricks in mind. Let's go over them. (...)
+advancedTutorial.dialog4=§B[Tutorial] If you look at §1this tile§B, it says there is §nexactly§r§B one mine in §Ethis area§B. (...)
+advancedTutorial.dialog5=§B[Tutorial] Now if you look at §1this tile§B, it says there is §nexactly§r§B one mine in §Ethis area§B. (...)
+advancedTutorial.dialog6=§B[Tutorial] Because you know the mine has to be in §Ethis area§B because of §1this tile§B, you can exclude §2this tile§B from being a mine! §2Open this tile.
+advancedTutorial.dialog7=§B[Tutorial] Nice! We can use this same principal on the other side of the field. Try if you can say something about §2this tile.
+advancedTutorial.dialog8=§B[Tutorial] Well done! So basically, when you have a number against a wall or in a corner, you can most of the times progress from this. (...)
+advancedTutorial.dialog9=§B[Tutorial] Another trick: Did you know that you can open tiles by left-clicking on a number which has the same amount of flags around it? Try for example to (left-)click on §2this tile.
+advancedTutorial.dialog10=§B[Tutorial] Well done! This is a very handy trick! It by the way also exists in the real minesweeper game.
+advancedTutorial.dialog11=§B[Tutorial] Now let's get back to the other side... You know from §1this tile§B that there is §nexactly§r§B one mine in one of §Ethese tiles§B. (...)
+advancedTutorial.dialog12=§B[Tutorial] Because know this, you know that the one of §1this tile§B has to be caused by §Ethis mine§B. The exact location of §Ethe mine§B doesn't really matter. (...)
+advancedTutorial.dialog13=§B[Tutorial] Therefore, you can exclude these three tiles from being a mine. Open these tiles. (...)
+advancedTutorial.dialog14=§B[Tutorial] Good! Now try to solve the remainder of the field! There are no guesses needed, only the tricks learned in this tutorial!
+advancedTutorial.dialog15=§B[Tutorial] Well done! You've finished this tutorial!

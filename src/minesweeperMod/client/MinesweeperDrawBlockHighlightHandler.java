@@ -6,10 +6,11 @@ import java.util.List;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
-import net.minecraftforge.common.ForgeDirection;
-import net.minecraftforge.event.ForgeSubscribe;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import org.lwjgl.opengl.GL11;
+
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 /**
  * Minesweeper Mod
@@ -27,7 +28,7 @@ public class MinesweeperDrawBlockHighlightHandler{
     public static List<int[]> renderPositions = new ArrayList<int[]>();
     public static List<float[]> renderColors = new ArrayList<float[]>();
 
-    @ForgeSubscribe
+    @SubscribeEvent
     public void onDrawBlockHighlightEvent(DrawBlockHighlightEvent event){
         pulseTransparency = getPulseValue() * 0.5F / 3000f;
         for(int i = 0; i < renderPositions.size(); i++) {

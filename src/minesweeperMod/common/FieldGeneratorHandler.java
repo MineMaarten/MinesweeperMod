@@ -93,7 +93,7 @@ public class FieldGeneratorHandler{
                     meta = 9;
                 }
             }
-            world.setBlock(coord[0], baseY, coord[1], MinesweeperMod.blockMinesweeper.blockID, meta, 3);
+            world.setBlock(coord[0], baseY, coord[1], MinesweeperMod.blockMinesweeper, meta, 3);
             toBeGenerated.remove(index);
         }
         levels.remove(0);

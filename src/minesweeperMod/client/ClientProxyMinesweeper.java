@@ -6,8 +6,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
-import cpw.mods.fml.common.registry.TickRegistry;
-import cpw.mods.fml.relauncher.Side;
 
 /**
  * Minesweeper Mod
@@ -27,7 +25,7 @@ public class ClientProxyMinesweeper extends CommonProxyMinesweeper{
     public void registerHandlers(){
         MinecraftForge.EVENT_BUS.register(new MinesweeperSoundHandler());
         MinecraftForge.EVENT_BUS.register(new MinesweeperDrawBlockHighlightHandler());
-        TickRegistry.registerTickHandler(new FieldStatHandler(), Side.CLIENT);
+        MinecraftForge.EVENT_BUS.register(new FieldStatHandler());
     }
 
     @Override

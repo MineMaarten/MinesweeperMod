@@ -3,6 +3,7 @@ package minesweeperMod.common;
 import java.util.Random;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.ChunkProviderFlat;
@@ -30,6 +31,9 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
                     break;
                 case 1:
                     generateEnd(world, random, chunkX * 16, chunkZ * 16);
+                default:
+                    generateSurface(world, random, chunkX * 16, chunkZ * 16);
+                    break;
             }
         }
     }
@@ -96,36 +100,36 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
 
         generateMinefieldTiles(world, baseX + 1, baseZ + 1, baseY, maxX - 1, maxZ - 1, difficulty);
         if(difficulty == 3) // when generating above a lava lake (probably)
-        fillWithMetadataBlocks(world, baseX, baseY - 1, baseZ, maxX, baseY - 1, maxZ, Block.netherrack.blockID, 0);
-        fillWithMetadataBlocks(world, baseX + 1, baseY + 1, baseZ + 1, maxX - 1, baseY + 5, maxZ - 1, 0, 0);// clear some space
+        fillWithMetadataBlocks(world, baseX, baseY - 1, baseZ, maxX, baseY - 1, maxZ, Blocks.netherrack, 0);
+        fillWithMetadataBlocks(world, baseX + 1, baseY + 1, baseZ + 1, maxX - 1, baseY + 5, maxZ - 1, Blocks.air, 0);// clear some space
         fillWithMetadataBlocks(world, baseX, baseY + 6, baseZ, maxX, baseY + 6, maxZ, getDifficultyBlock(difficulty), getDifficultyMetadata(difficulty));// roof
         fillWithMetadataBlocks(world, baseX, baseY, baseZ, maxX, baseY + 6, baseZ, getDifficultyBlock(difficulty), getDifficultyMetadata(difficulty));// -Z wall
         fillWithMetadataBlocks(world, baseX, baseY, maxZ, maxX, baseY + 6, maxZ, getDifficultyBlock(difficulty), getDifficultyMetadata(difficulty));// +Z wall
         fillWithMetadataBlocks(world, baseX, baseY, baseZ, baseX, baseY + 6, maxZ, getDifficultyBlock(difficulty), getDifficultyMetadata(difficulty));// -X wall
         fillWithMetadataBlocks(world, maxX, baseY, baseZ, maxX, baseY + 6, maxZ, getDifficultyBlock(difficulty), getDifficultyMetadata(difficulty));// +X wall
         if(difficulty == 2) {
-            fillWithMetadataBlocks(world, middleX - oddX - 1, baseY, baseZ, middleX + 2, baseY + 5, baseZ, Block.stoneBrick.blockID, 3);// -Z chiseled stone doorway
-            fillWithMetadataBlocks(world, middleX - oddX - 1, baseY, maxZ, middleX + 2, baseY + 5, maxZ, Block.stoneBrick.blockID, 3);// +Z doorway
-            fillWithMetadataBlocks(world, baseX, baseY, middleZ - oddZ - 1, baseX, baseY + 5, middleZ + 2, Block.stoneBrick.blockID, 3);// -X doorway
-            fillWithMetadataBlocks(world, maxX, baseY, middleZ - oddZ - 1, maxX, baseY + 5, middleZ + 2, Block.stoneBrick.blockID, 3);// +X doorway
+            fillWithMetadataBlocks(world, middleX - oddX - 1, baseY, baseZ, middleX + 2, baseY + 5, baseZ, Blocks.stonebrick, 3);// -Z chiseled stone doorway
+            fillWithMetadataBlocks(world, middleX - oddX - 1, baseY, maxZ, middleX + 2, baseY + 5, maxZ, Blocks.stonebrick, 3);// +Z doorway
+            fillWithMetadataBlocks(world, baseX, baseY, middleZ - oddZ - 1, baseX, baseY + 5, middleZ + 2, Blocks.stonebrick, 3);// -X doorway
+            fillWithMetadataBlocks(world, maxX, baseY, middleZ - oddZ - 1, maxX, baseY + 5, middleZ + 2, Blocks.stonebrick, 3);// +X doorway
         }
 
-        fillWithMetadataBlocks(world, middleX - oddX, baseY + 1, baseZ, middleX + 1, baseY + 4, baseZ, 0, 0);// -Z doorway
-        fillWithMetadataBlocks(world, middleX - oddX, baseY + 1, maxZ, middleX + 1, baseY + 4, maxZ, 0, 0);// +Z doorway
-        fillWithMetadataBlocks(world, baseX, baseY + 1, middleZ - oddZ, baseX, baseY + 4, middleZ + 1, 0, 0);// -X doorway
-        fillWithMetadataBlocks(world, maxX, baseY + 1, middleZ - oddZ, maxX, baseY + 4, middleZ + 1, 0, 0);// +X doorway
+        fillWithMetadataBlocks(world, middleX - oddX, baseY + 1, baseZ, middleX + 1, baseY + 4, baseZ, Blocks.air, 0);// -Z doorway
+        fillWithMetadataBlocks(world, middleX - oddX, baseY + 1, maxZ, middleX + 1, baseY + 4, maxZ, Blocks.air, 0);// +Z doorway
+        fillWithMetadataBlocks(world, baseX, baseY + 1, middleZ - oddZ, baseX, baseY + 4, middleZ + 1, Blocks.air, 0);// -X doorway
+        fillWithMetadataBlocks(world, maxX, baseY + 1, middleZ - oddZ, maxX, baseY + 4, middleZ + 1, Blocks.air, 0);// +X doorway
 
-        world.setBlock(middleX - 1 - oddX, baseY + 3, baseZ + 1, Block.torchWood.blockID, 3, 3);
-        world.setBlock(middleX + 2, baseY + 3, baseZ + 1, Block.torchWood.blockID, 3, 3);
+        world.setBlock(middleX - 1 - oddX, baseY + 3, baseZ + 1, Blocks.torch, 3, 3);
+        world.setBlock(middleX + 2, baseY + 3, baseZ + 1, Blocks.torch, 3, 3);
 
-        world.setBlock(middleX - 1 - oddX, baseY + 3, maxZ - 1, Block.torchWood.blockID, 4, 3);
-        world.setBlock(middleX + 2, baseY + 3, maxZ - 1, Block.torchWood.blockID, 4, 3);
+        world.setBlock(middleX - 1 - oddX, baseY + 3, maxZ - 1, Blocks.torch, 4, 3);
+        world.setBlock(middleX + 2, baseY + 3, maxZ - 1, Blocks.torch, 4, 3);
 
-        world.setBlock(baseX + 1, baseY + 3, middleZ - 1 - oddZ, Block.torchWood.blockID, 1, 3);
-        world.setBlock(baseX + 1, baseY + 3, middleZ + 2, Block.torchWood.blockID, 1, 3);
+        world.setBlock(baseX + 1, baseY + 3, middleZ - 1 - oddZ, Blocks.torch, 1, 3);
+        world.setBlock(baseX + 1, baseY + 3, middleZ + 2, Blocks.torch, 1, 3);
 
-        world.setBlock(maxX - 1, baseY + 3, middleZ - 1 - oddZ, Block.torchWood.blockID, 2, 3);
-        world.setBlock(maxX - 1, baseY + 3, middleZ + 2, Block.torchWood.blockID, 2, 3);
+        world.setBlock(maxX - 1, baseY + 3, middleZ - 1 - oddZ, Blocks.torch, 2, 3);
+        world.setBlock(maxX - 1, baseY + 3, middleZ + 2, Blocks.torch, 2, 3);
 
         /*
          * torch metadata's: 1: X+ 2: X- 3: Z+ 4: Z-
@@ -183,7 +187,7 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
         }
 
         // generate the actual corridor
-        if(difficulty == 3) fillWithMetadataBlocks(world, minX, Y - 1, minZ, maxX, Y - 1, maxZ, Block.netherrack.blockID, 0);
+        if(difficulty == 3) fillWithMetadataBlocks(world, minX, Y - 1, minZ, maxX, Y - 1, maxZ, Blocks.netherrack, 0);
         generateMinefieldTiles(world, minX, minZ, Y, maxX, maxZ, difficulty);
         fillWithMetadataBlocks(world, minX, Y + CORRIDOR_HEIGHT, minZ, maxX, Y + CORRIDOR_HEIGHT, maxZ, getDifficultyBlock(difficulty), getDifficultyMetadata(difficulty));
 
@@ -191,28 +195,28 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
             fillWithMetadataBlocks(world, minX, Y, minZ, maxX, Y + CORRIDOR_HEIGHT, minZ, getDifficultyBlock(difficulty), getDifficultyMetadata(difficulty));
             fillWithMetadataBlocks(world, minX, Y, maxZ, maxX, Y + CORRIDOR_HEIGHT, maxZ, getDifficultyBlock(difficulty), getDifficultyMetadata(difficulty));
             if(difficulty == 2) {
-                fillWithMetadataBlocks(world, minX, Y + 1, minZ, minX, Y + CORRIDOR_HEIGHT, maxZ, Block.stoneBrick.blockID, 3);
-                fillWithMetadataBlocks(world, maxX, Y + 1, minZ, maxX, Y + CORRIDOR_HEIGHT, maxZ, Block.stoneBrick.blockID, 3);
+                fillWithMetadataBlocks(world, minX, Y + 1, minZ, minX, Y + CORRIDOR_HEIGHT, maxZ, Blocks.stonebrick, 3);
+                fillWithMetadataBlocks(world, maxX, Y + 1, minZ, maxX, Y + CORRIDOR_HEIGHT, maxZ, Blocks.stonebrick, 3);
             }
-            fillWithMetadataBlocks(world, maxX + 1, Y + 1, minZ + 1, maxX + 1, Y + CORRIDOR_HEIGHT - 1, maxZ - 1, 0, 0); // first remove all the torches
-            fillWithMetadataBlocks(world, minX - 1, Y + 1, minZ + 1, maxX, Y + CORRIDOR_HEIGHT - 1, maxZ - 1, 0, 0);
-            world.setBlock(minX - 1, Y + 3, minZ, Block.torchWood.blockID, 2, 3);
-            world.setBlock(minX - 1, Y + 3, maxZ, Block.torchWood.blockID, 2, 3);
-            world.setBlock(maxX + 1, Y + 3, minZ, Block.torchWood.blockID, 1, 3);
-            world.setBlock(maxX + 1, Y + 3, maxZ, Block.torchWood.blockID, 1, 3);
+            fillWithMetadataBlocks(world, maxX + 1, Y + 1, minZ + 1, maxX + 1, Y + CORRIDOR_HEIGHT - 1, maxZ - 1, Blocks.air, 0); // first remove all the torches
+            fillWithMetadataBlocks(world, minX - 1, Y + 1, minZ + 1, maxX, Y + CORRIDOR_HEIGHT - 1, maxZ - 1, Blocks.air, 0);
+            world.setBlock(minX - 1, Y + 3, minZ, Blocks.torch, 2, 3);
+            world.setBlock(minX - 1, Y + 3, maxZ, Blocks.torch, 2, 3);
+            world.setBlock(maxX + 1, Y + 3, minZ, Blocks.torch, 1, 3);
+            world.setBlock(maxX + 1, Y + 3, maxZ, Blocks.torch, 1, 3);
         } else { // 'moving' on the Z-axis
             fillWithMetadataBlocks(world, minX, Y, minZ, minX, Y + CORRIDOR_HEIGHT, maxZ, getDifficultyBlock(difficulty), getDifficultyMetadata(difficulty));
             fillWithMetadataBlocks(world, maxX, Y, minZ, maxX, Y + CORRIDOR_HEIGHT, maxZ, getDifficultyBlock(difficulty), getDifficultyMetadata(difficulty));
             if(difficulty == 2) {
-                fillWithMetadataBlocks(world, minX, Y + 1, minZ, maxX, Y + CORRIDOR_HEIGHT, minZ, Block.stoneBrick.blockID, 3);
-                fillWithMetadataBlocks(world, minX, Y + 1, maxZ, maxX, Y + CORRIDOR_HEIGHT, maxZ, Block.stoneBrick.blockID, 3);
+                fillWithMetadataBlocks(world, minX, Y + 1, minZ, maxX, Y + CORRIDOR_HEIGHT, minZ, Blocks.stonebrick, 3);
+                fillWithMetadataBlocks(world, minX, Y + 1, maxZ, maxX, Y + CORRIDOR_HEIGHT, maxZ, Blocks.stonebrick, 3);
             }
-            fillWithMetadataBlocks(world, minX + 1, Y + 1, maxZ + 1, maxX - 1, Y + CORRIDOR_HEIGHT - 1, maxZ + 1, 0, 0); // first remove the torches
-            fillWithMetadataBlocks(world, minX + 1, Y + 1, minZ - 1, maxX - 1, Y + CORRIDOR_HEIGHT - 1, maxZ, 0, 0);
-            world.setBlock(minX, Y + 3, maxZ + 1, Block.torchWood.blockID, 3, 3);
-            world.setBlock(maxX, Y + 3, maxZ + 1, Block.torchWood.blockID, 3, 3);
-            world.setBlock(minX, Y + 3, minZ - 1, Block.torchWood.blockID, 4, 3);
-            world.setBlock(maxX, Y + 3, minZ - 1, Block.torchWood.blockID, 4, 3);
+            fillWithMetadataBlocks(world, minX + 1, Y + 1, maxZ + 1, maxX - 1, Y + CORRIDOR_HEIGHT - 1, maxZ + 1, Blocks.air, 0); // first remove the torches
+            fillWithMetadataBlocks(world, minX + 1, Y + 1, minZ - 1, maxX - 1, Y + CORRIDOR_HEIGHT - 1, maxZ, Blocks.air, 0);
+            world.setBlock(minX, Y + 3, maxZ + 1, Blocks.torch, 3, 3);
+            world.setBlock(maxX, Y + 3, maxZ + 1, Blocks.torch, 3, 3);
+            world.setBlock(minX, Y + 3, minZ - 1, Blocks.torch, 4, 3);
+            world.setBlock(maxX, Y + 3, minZ - 1, Blocks.torch, 4, 3);
         }
     }
 
@@ -221,25 +225,25 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
         int middleZ = baseZ + (maxZ - baseZ) / 2;
         for(int i = baseY + 1; i <= baseY + 4; i++) {
             for(int j = 0; j < 2; j++) {
-                if(world.getBlockId(baseX, i, middleZ + j) == 0) return true;
-                if(world.getBlockId(maxX, i, middleZ + j) == 0) return true;
-                if(world.getBlockId(middleX + j, i, baseZ) == 0) return true;
-                if(world.getBlockId(middleX + j, i, maxZ) == 0) return true;
+                if(world.isAirBlock(baseX, i, middleZ + j)) return true;
+                if(world.isAirBlock(maxX, i, middleZ + j)) return true;
+                if(world.isAirBlock(middleX + j, i, baseZ)) return true;
+                if(world.isAirBlock(middleX + j, i, maxZ)) return true;
             }
         }
         return false;
     }
 
-    private int getDifficultyBlock(int difficulty){
+    private Block getDifficultyBlock(int difficulty){
         switch(difficulty){
             case 0:
-                return Block.planks.blockID;
+                return Blocks.planks;
             case 1:
-                return Block.stoneBrick.blockID;
+                return Blocks.stonebrick;
             case 2:
-                return Block.stoneBrick.blockID;
+                return Blocks.stonebrick;
             default:
-                return Block.netherBrick.blockID;
+                return Blocks.nether_brick;
         }
     }
 
@@ -247,11 +251,11 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
         return 0;
     }
 
-    private void fillWithMetadataBlocks(World world, int minX, int minY, int minZ, int maxX, int maxY, int maxZ, int blockID, int metadata){
+    private void fillWithMetadataBlocks(World world, int minX, int minY, int minZ, int maxX, int maxY, int maxZ, Block block, int metadata){
         for(int i = minX; i <= maxX; i++) {
             for(int j = minY; j <= maxY; j++) {
                 for(int k = minZ; k <= maxZ; k++) {
-                    world.setBlock(i, j, k, blockID, metadata, 3);
+                    world.setBlock(i, j, k, block, metadata, 3);
                 }
             }
         }
@@ -280,7 +284,7 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
                 } else {
                     meta = 9;
                 }
-                world.setBlock(i, Y, j, MinesweeperMod.blockMinesweeper.blockID, meta, 3);
+                world.setBlock(i, Y, j, MinesweeperMod.blockMinesweeper, meta, 3);
             }
         }
     }
@@ -293,8 +297,8 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
             currentLevel = 0; // reset the counter
             for(int i = minX; i <= maxX; i++) {
                 for(int j = minZ; j <= maxZ; j++) {
-                    if(world.getBlockId(i, Y, j) != 0 && world.getBlockId(i, Y, j) != Block.tallGrass.blockID) currentLevel++;
-                    if(world.getBlockId(i, Y, j) == Block.waterStill.blockID) return 0;
+                    if(!world.isAirBlock(i, Y, j) && !world.getBlock(i, Y, j).isReplaceable(world, i, Y, j)) currentLevel++;
+                    if(world.getBlock(i, Y, j) == Blocks.water) return 0;
                 }
             }
             if(lastLevel < currentLevel - (maxX - minX) * (maxZ - minZ) * 0.9F && Y != 100) { // if the underlying Y level has 90% more blocks then the Y level above call it flat.
@@ -307,7 +311,7 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
     private boolean isCollidingWithMinefield(World world, int minX, int minZ, int maxX, int maxZ, int Y){
         for(int i = minX; i <= maxX; i++) {
             for(int j = minZ; j <= maxZ; j++) {
-                if(world.getBlockId(i, Y, j) == MinesweeperMod.blockMinesweeper.blockID) return true;
+                if(world.getBlock(i, Y, j) == MinesweeperMod.blockMinesweeper) return true;
             }
         }
         return false;

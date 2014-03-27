@@ -1,9 +1,9 @@
 package minesweeperMod.common;
 
+import minesweeperMod.common.network.PacketSpawnParticle;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
-import cpw.mods.fml.common.network.PacketDispatcher;
 
 /**
  * Minesweeper Mod
@@ -39,14 +39,14 @@ public class EntityFlag extends Entity{
                 double randX = posX + (rand.nextDouble() - 0.5D) / 2D;
                 double randY = posY + rand.nextDouble() * 2D;
                 double randZ = posZ + (rand.nextDouble() - 0.5D) / 2D;
-                PacketDispatcher.sendPacketToAllAround(posX, posY, posZ, 64D, worldObj.provider.dimensionId, MinesweeperPacketHandler.spawnParticle("explode", randX, randY, randZ, 0, 0, 0));
+                MinesweeperMod.packetPipeline.sendToAllAround(new PacketSpawnParticle("explode", randX, randY, randZ, 0, 0, 0), worldObj);
             }
         }
     }
 
     @Override
     public void onUpdate(){
-        if(!worldObj.isRemote && (worldObj.getBlockId(flaggedX, flaggedY, flaggedZ) != MinesweeperMod.blockMinesweeper.blockID || !MinesweeperUtils.isTileFlagged(worldObj.getBlockMetadata(flaggedX, flaggedY, flaggedZ)))) {
+        if(!worldObj.isRemote && (worldObj.getBlock(flaggedX, flaggedY, flaggedZ) != MinesweeperMod.blockMinesweeper || !MinesweeperUtils.isTileFlagged(worldObj.getBlockMetadata(flaggedX, flaggedY, flaggedZ)))) {
             setDead();
             spawnSmoke();
         }

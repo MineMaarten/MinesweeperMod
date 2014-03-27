@@ -1,6 +1,6 @@
 package minesweeperMod.common;
 
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -14,18 +14,14 @@ import net.minecraft.world.World;
  */
 
 public class ItemMineDetector extends Item{
-    public ItemMineDetector(int par1){
-        super(par1);
-    }
-
     @Override
-    public void registerIcons(IconRegister par1IconRegister){
+    public void registerIcons(IIconRegister par1IconRegister){
         itemIcon = par1IconRegister.registerIcon("minesweeperMod:ItemMineDetector");
     }
 
     @Override
     public boolean onItemUse(ItemStack IStack, EntityPlayer player, World world, int x, int y, int z, int par7, float par8, float par9, float par10){
-        if(world.getBlockId(x, y, z) == MinesweeperMod.blockMinesweeper.blockID) {
+        if(world.getBlock(x, y, z) == MinesweeperMod.blockMinesweeper) {
             if(world.isRemote) {
                 player.addStat(MinesweeperUtils.getAchieveFromName("achieveUseDetector"), 1);
             }

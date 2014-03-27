@@ -1,29 +1,31 @@
 package minesweeperMod.common;
 
+import minesweeperMod.common.network.PacketPipeline;
+import minesweeperMod.common.network.PacketSpawnParticle;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.Achievement;
 import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraftforge.common.AchievementPage;
 import net.minecraftforge.common.ChestGenHooks;
-import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.Property;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Property;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.LanguageRegistry;
-import cpw.mods.fml.common.registry.TickRegistry;
-import cpw.mods.fml.relauncher.Side;
 
 /**
  * Minesweeper Mod
@@ -32,15 +34,14 @@ import cpw.mods.fml.relauncher.Side;
  * @license Lesser GNU Public License v3 (http://www.gnu.org/licenses/lgpl.html)
  */
 // TODO increase version
-@Mod(modid = "Minemaarten_Minesweeper Mod", name = "Minesweeper Mod", version = "1.4.5")
-@NetworkMod(clientSideRequired = true, serverSideRequired = false, channels = {"minesweeper"}, packetHandler = MinesweeperPacketHandler.class)
+@Mod(modid = Constants.MOD_ID, name = "Minesweeper Mod", version = "1.4.6")
 public class MinesweeperMod{
 
     @SidedProxy(clientSide = "minesweeperMod.client.ClientProxyMinesweeper", serverSide = "minesweeperMod.common.CommonProxyMinesweeper")
     public static CommonProxyMinesweeper proxy;
 
-    @Instance("Minemaarten_Minesweeper Mod")
-    public static MinesweeperMod instance = new MinesweeperMod();
+    @Instance(Constants.MOD_ID)
+    public static MinesweeperMod instance;
 
     public static Block blockMinesweeper;
 
@@ -48,11 +49,6 @@ public class MinesweeperMod{
     public static Item itemMineDetector;
 
     public static MinesweeperTickHandler tickHandler;
-
-    private static int blockMinesweeperID;
-
-    private static int itemFieldGeneratorID;
-    private static int itemMineDetectorID;
 
     public static int configEasySR;
     public static int configMediumSR;
@@ -70,13 +66,12 @@ public class MinesweeperMod{
     public static boolean configEnableGeneratorRecipes;
     public static boolean configEnableDetectorRecipe;
 
+    public static final PacketPipeline packetPipeline = new PacketPipeline();
+
     @EventHandler
     public void preInit(FMLPreInitializationEvent event){
         Configuration config = new Configuration(event.getSuggestedConfigurationFile());
         config.load();
-
-        // block ID's
-        blockMinesweeperID = config.getBlock("Minesweeper ID", 530).getInt();
 
         // general
         Property property = config.get(Configuration.CATEGORY_GENERAL, "Easy minefield generation chance", 160);
@@ -127,43 +122,47 @@ public class MinesweeperMod{
         property.comment = "If true the flag model will be rendered if you flag a tile.";
         configRenderFlag = property.getBoolean(false);
 
-        // item ID's
-        itemFieldGeneratorID = config.getItem("Field Generator ID", 5050).getInt();
-        itemMineDetectorID = config.getItem("Mine Detector ID", 5051).getInt();
-
         config.save();// save the configuration file
 
-        blockMinesweeper = new BlockMinesweeper(blockMinesweeperID, Material.ground).setHardness(3.0F).setResistance(1.0F).setUnlocalizedName("Minesweeper Block");// .setCreativeTab(CreativeTabs.tabBlock);
+        blockMinesweeper = new BlockMinesweeper(Material.ground).setHardness(3.0F).setResistance(1.0F).setBlockName("minesweeperBlock");// .setCreativeTab(CreativeTabs.tabBlock);
 
-        itemFieldGenerator = new ItemFieldGenerator(itemFieldGeneratorID).setCreativeTab(CreativeTabs.tabTools).setUnlocalizedName("Field Generator");
-        itemMineDetector = new ItemMineDetector(itemMineDetectorID).setCreativeTab(CreativeTabs.tabTools).setUnlocalizedName("Mine Detector");
+        itemFieldGenerator = new ItemFieldGenerator().setCreativeTab(CreativeTabs.tabTools).setUnlocalizedName("fieldGenerator");
+        itemMineDetector = new ItemMineDetector().setCreativeTab(CreativeTabs.tabTools).setUnlocalizedName("mineDetector");
 
         proxy.registerHandlers();
         tickHandler = new MinesweeperTickHandler();
-        TickRegistry.registerTickHandler(tickHandler, Side.SERVER);
+        //      TickRegistry.registerTickHandler(tickHandler, Side.SERVER);
+        FMLCommonHandler.instance().bus().register(tickHandler);
+
+        gameRegisters();
         achievementRegisters();
     }
 
     @EventHandler
     public void load(FMLInitializationEvent event){
-
-        gameRegisters();
         MinecraftForge.EVENT_BUS.register(new ForgeEventHandler());
-        languageRegisters();
 
         // AchievementPage.registerAchievementPage(achievementPageMinesweeper);
 
         proxy.registerRenders();
+
+        packetPipeline.registerPacket(PacketSpawnParticle.class);
+        packetPipeline.initialise();
+    }
+
+    @EventHandler
+    public void postInit(FMLPostInitializationEvent event){
+
     }
 
     public void gameRegisters(){
 
         // new blocks
-        GameRegistry.registerBlock(blockMinesweeper, "Minesweeper Block");
+        GameRegistry.registerBlock(blockMinesweeper, "minesweeperBlock");
 
         // new items
-        GameRegistry.registerItem(itemFieldGenerator, "Field Generator");
-        GameRegistry.registerItem(itemMineDetector, "Mine Detector");
+        GameRegistry.registerItem(itemFieldGenerator, "fieldGenerator", Constants.MOD_ID);
+        GameRegistry.registerItem(itemMineDetector, "mineDetector", Constants.MOD_ID);
 
         // crafting recipes
 
@@ -173,11 +172,11 @@ public class MinesweeperMod{
 
         // field generator recipes
         if(configEnableGeneratorRecipes) {
-            GameRegistry.addRecipe(new ItemStack(itemFieldGenerator, 1, 0), " ws", "wws", "  s", 'w', new ItemStack(Block.cloth.blockID, 1, 4), 's', new ItemStack(Item.stick));
-            GameRegistry.addRecipe(new ItemStack(itemFieldGenerator, 1, 1), " ws", "wws", "  s", 'w', new ItemStack(Block.cloth.blockID, 1, 1), 's', new ItemStack(Item.stick));
-            GameRegistry.addRecipe(new ItemStack(itemFieldGenerator, 1, 2), " ws", "wws", "  s", 'w', new ItemStack(Block.cloth.blockID, 1, 14), 's', new ItemStack(Item.stick));
-            GameRegistry.addRecipe(new ItemStack(itemFieldGenerator, 1, 3), " ws", "wws", "  s", 'w', new ItemStack(Block.cloth.blockID, 1, 12), 's', new ItemStack(Item.stick));
-            GameRegistry.addRecipe(new ItemStack(itemFieldGenerator, 1, 100), " ws", "wws", "  s", 'w', new ItemStack(Block.cloth.blockID, 1, 11), 's', new ItemStack(Item.stick));
+            GameRegistry.addRecipe(new ItemStack(itemFieldGenerator, 1, 0), " ws", "wws", "  s", 'w', new ItemStack(Blocks.wool, 1, 4), 's', new ItemStack(Items.stick));
+            GameRegistry.addRecipe(new ItemStack(itemFieldGenerator, 1, 1), " ws", "wws", "  s", 'w', new ItemStack(Blocks.wool, 1, 1), 's', new ItemStack(Items.stick));
+            GameRegistry.addRecipe(new ItemStack(itemFieldGenerator, 1, 2), " ws", "wws", "  s", 'w', new ItemStack(Blocks.wool, 1, 14), 's', new ItemStack(Items.stick));
+            GameRegistry.addRecipe(new ItemStack(itemFieldGenerator, 1, 3), " ws", "wws", "  s", 'w', new ItemStack(Blocks.wool, 1, 12), 's', new ItemStack(Items.stick));
+            GameRegistry.addRecipe(new ItemStack(itemFieldGenerator, 1, 100), " ws", "wws", "  s", 'w', new ItemStack(Blocks.wool, 1, 11), 's', new ItemStack(Items.stick));
             // generate the field size recipes (small --> medium --> big)
             for(int i = 0; i < 8; i++) {
                 ItemStack inputStack = new ItemStack(itemFieldGenerator, 1, i);
@@ -187,7 +186,7 @@ public class MinesweeperMod{
 
         // mine detector recipe
         if(configEnableDetectorRecipe) {
-            GameRegistry.addRecipe(new ItemStack(itemMineDetector), "  i", " i ", "ww ", 'i', new ItemStack(Item.ingotIron), 'w', new ItemStack(Block.cloth.blockID, 1, 15));
+            GameRegistry.addRecipe(new ItemStack(itemMineDetector), "  i", " i ", "ww ", 'i', new ItemStack(Items.iron_ingot), 'w', new ItemStack(Blocks.wool, 1, 15));
         }
 
         // tile entities
@@ -195,11 +194,11 @@ public class MinesweeperMod{
         // "tileEntityEntityCannon");
 
         // worldgenerators
-        GameRegistry.registerWorldGenerator(new WorldGeneratorMinesweeper());
-        ChestGenHooks.getInfo(ChestGenHooks.VILLAGE_BLACKSMITH).addItem(new WeightedRandomChestContent(new ItemStack(itemFieldGenerator.itemID, 1, 101), 1, 1, 5));
-        ChestGenHooks.getInfo(ChestGenHooks.DUNGEON_CHEST).addItem(new WeightedRandomChestContent(new ItemStack(itemFieldGenerator.itemID, 1, 101), 1, 1, 5));
+        GameRegistry.registerWorldGenerator(new WorldGeneratorMinesweeper(), 0);
+        ChestGenHooks.getInfo(ChestGenHooks.VILLAGE_BLACKSMITH).addItem(new WeightedRandomChestContent(new ItemStack(itemFieldGenerator, 1, 101), 1, 1, 5));
+        ChestGenHooks.getInfo(ChestGenHooks.DUNGEON_CHEST).addItem(new WeightedRandomChestContent(new ItemStack(itemFieldGenerator, 1, 101), 1, 1, 5));
 
-        EntityRegistry.registerModEntity(EntityFlag.class, "Minesweeper Flag", 0, this, 80, 1, true);
+        EntityRegistry.registerModEntity(EntityFlag.class, "minesweeperFlag", 0, this, 80, 1, true);
 
     }
 
@@ -207,8 +206,8 @@ public class MinesweeperMod{
 
         Achievement[] achieveTilesCleared = new Achievement[5];
         Achievement[] achieveDifficultyCleared = new Achievement[4];
-        achieveTilesCleared[0] = new Achievement(2100, "achieveCleared1", 0, -3, itemFieldGenerator, (Achievement)null).setIndependent();
-        achieveDifficultyCleared[0] = new Achievement(2105, "achieveDifficulty1", -1, -1, itemFieldGenerator, (Achievement)null).setIndependent();
+        achieveTilesCleared[0] = new Achievement("achieveCleared1", "achieveCleared1", 0, -3, itemFieldGenerator, (Achievement)null).initIndependentStat();
+        achieveDifficultyCleared[0] = new Achievement("achieveDifficulty1", "achieveDifficulty1", -1, -1, itemFieldGenerator, (Achievement)null).initIndependentStat();
         for(int i = 1; i < 5; i++) {
             int meta;
             int xPosTiles;
@@ -243,8 +242,8 @@ public class MinesweeperMod{
                     meta = 8;
             }
 
-            achieveTilesCleared[i] = new Achievement(2100 + i, "achieveCleared" + (i + 1), xPosTiles, yPosTiles, new ItemStack(itemFieldGenerator.itemID, 1, meta), achieveTilesCleared[i - 1]).setIndependent();
-            if(i < 4) achieveDifficultyCleared[i] = new Achievement(2105 + i, "achieveDifficulty" + (i + 1), xPosDifficulty, yPosDifficulty, new ItemStack(itemFieldGenerator.itemID, 1, i), (Achievement)null).setIndependent();
+            achieveTilesCleared[i] = new Achievement("achieveCleared" + (i + 1), "achieveCleared" + (i + 1), xPosTiles, yPosTiles, new ItemStack(itemFieldGenerator, 1, meta), achieveTilesCleared[i - 1]).initIndependentStat();
+            if(i < 4) achieveDifficultyCleared[i] = new Achievement("achieveDifficulty" + (i + 1), "achieveDifficulty" + (i + 1), xPosDifficulty, yPosDifficulty, new ItemStack(itemFieldGenerator, 1, i), (Achievement)null).initIndependentStat();
 
         }
 
@@ -257,74 +256,18 @@ public class MinesweeperMod{
             allAchieves[i + achieveTilesCleared.length] = achieveDifficultyCleared[i];
         }
 
-        allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length] = new Achievement(2109, "achieveTutorial", -5, -3, new ItemStack(itemFieldGenerator, 1, 100), (Achievement)null).setIndependent();
-        allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length + 1] = new Achievement(2110, "achieveAdvancedTutorial", -5, -1, new ItemStack(itemFieldGenerator, 1, 101), allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length]).setIndependent();
+        allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length] = new Achievement("achieveTutorial", "achieveTutorial", -5, -3, new ItemStack(itemFieldGenerator, 1, 100), (Achievement)null).initIndependentStat();
+        allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length + 1] = new Achievement("achieveAdvancedTutorial", "achieveAdvancedTutorial", -5, -1, new ItemStack(itemFieldGenerator, 1, 101), allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length]).initIndependentStat();
 
-        allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length + 2] = new Achievement(2111, "achieveUseDetector", -5, 2, itemMineDetector, (Achievement)null).setIndependent();
-        allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length + 3] = new Achievement(2112, "achieve8", 5, -3, new ItemStack(blockMinesweeper, 1, 8), (Achievement)null).setSpecial().setIndependent();
-        allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length + 4] = new Achievement(2113, "achieve7", 5, -1, new ItemStack(blockMinesweeper, 1, 7), (Achievement)null).setSpecial().setIndependent();
+        allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length + 2] = new Achievement("achieveUseDetector", "achieveUseDetector", -5, 2, itemMineDetector, (Achievement)null).initIndependentStat();
+        allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length + 3] = new Achievement("achieve8", "achieve8", 5, -3, new ItemStack(blockMinesweeper, 1, 8), (Achievement)null).setSpecial().initIndependentStat();
+        allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length + 4] = new Achievement("achieve7", "achieve7", 5, -1, new ItemStack(blockMinesweeper, 1, 7), (Achievement)null).setSpecial().initIndependentStat();
 
         for(Achievement achieve : allAchieves) {
-            achieve.registerAchievement();
+            achieve.registerStat();
         }
 
         AchievementPage.registerAchievementPage(new AchievementPage("Minesweeper", allAchieves));
-
-    }
-
-    public void languageRegisters(){
-        LanguageRegistry.addName(blockMinesweeper, "Minesweeper Block");
-
-        LanguageRegistry.addName(itemFieldGenerator, "Field Generator");
-        LanguageRegistry.addName(itemMineDetector, "Mine Detector");
-
-        for(int i = 0; i < 12; i++) {
-            LanguageRegistry.addName(new ItemStack(itemFieldGenerator, 1, i), "Field Generator");
-        }
-        LanguageRegistry.addName(new ItemStack(itemFieldGenerator, 1, 100), "Tutorial Generator");
-        LanguageRegistry.addName(new ItemStack(itemFieldGenerator, 1, 101), "Advanced Tutorial Generator");
-        LanguageRegistry.instance().addStringLocalization("entity.Minemaarten_Minesweeper Mod.Minesweeper Flag.name", "Minesweeper Flag");
-
-        addAchievementName("achieveCleared1", "Planting The Flag");
-        addAchievementName("achieveCleared2", "A Bigger Challenge");
-        addAchievementName("achieveCleared3", "Mining As A Daily Job");
-        addAchievementName("achieveCleared4", "No-Life");
-        addAchievementName("achieveCleared5", "Unnecessary Risk");
-        addAchievementDesc("achieveCleared1", "Clear a minefield existing out of more than 50 tiles.");
-        addAchievementDesc("achieveCleared2", "Clear a minefield existing out of more than 100 tiles.");
-        addAchievementDesc("achieveCleared3", "Clear a minefield existing out of more than 200 tiles.");
-        addAchievementDesc("achieveCleared4", "Clear a minefield existing out of more than 500 tiles.");
-        addAchievementDesc("achieveCleared5", "Clear a minefield existing out of more than 1000 tiles.");
-
-        addAchievementName("achieveDifficulty1", "Peanuts");
-        addAchievementName("achieveDifficulty2", "Working On The Field");
-        addAchievementName("achieveDifficulty3", "Blowing Your Socks Off");
-        addAchievementName("achieveDifficulty4", "Taking A High Risk");
-        addAchievementDesc("achieveDifficulty1", "Clear an easy minefield existing out of more than 50 tiles.");
-        addAchievementDesc("achieveDifficulty2", "Clear a normal minefield existing out of more than 50 tiles.");
-        addAchievementDesc("achieveDifficulty3", "Clear a hard minefield existing out of more than 50 tiles.");
-        addAchievementDesc("achieveDifficulty4", "Clear a hardcore minefield existing out of more than 50 tiles.");
-
-        addAchievementName("achieveTutorial", "Started From Scratch");
-        addAchievementDesc("achieveTutorial", "Complete the Minesweeper Tutorial.");
-        addAchievementName("achieveAdvancedTutorial", "Advancing");
-        addAchievementDesc("achieveAdvancedTutorial", "Complete the Advanced Minesweeper Tutorial.");
-
-        addAchievementName("achieveUseDetector", "Safety First");
-        addAchievementDesc("achieveUseDetector", "Use the Mine Detector");
-
-        addAchievementName("achieve8", "An EIGHT??!");
-        addAchievementDesc("achieve8", "Find an 8.");
-        addAchievementName("achieve7", "Uncommon Find");
-        addAchievementDesc("achieve7", "Find a 7.");
-    }
-
-    private void addAchievementName(String ach, String name){
-        LanguageRegistry.instance().addStringLocalization("achievement." + ach, "en_US", name);
-    }
-
-    private void addAchievementDesc(String ach, String desc){
-        LanguageRegistry.instance().addStringLocalization("achievement." + ach + ".desc", "en_US", desc);
     }
 
 }

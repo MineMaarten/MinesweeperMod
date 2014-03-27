@@ -3,12 +3,13 @@ package minesweeperMod.common;
 import java.util.List;
 import java.util.Random;
 
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
+import net.minecraft.util.IIcon;
+import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -21,20 +22,16 @@ import cpw.mods.fml.relauncher.SideOnly;
  */
 
 public class ItemFieldGenerator extends Item{
-    Icon[] texture;
+    IIcon[] texture;
 
-    public ItemFieldGenerator(int par1){
-        super(par1);
+    public ItemFieldGenerator(){
+        super();
         setHasSubtypes(true);
-    }
-
-    public String getTextureFile(){
-        return "/minesweeperMod/textures/minesweeper.png";
     }
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void getSubItems(int par1, CreativeTabs tab, List subItems){
+    public void getSubItems(Item par1, CreativeTabs tab, List subItems){
         for(int ix = 0; ix < 12; ix++) {
             subItems.add(new ItemStack(this, 1, ix));
         }
@@ -43,7 +40,7 @@ public class ItemFieldGenerator extends Item{
     }
 
     @Override
-    public Icon getIconFromDamage(int par1){
+    public IIcon getIconFromDamage(int par1){
         if(par1 < 12) return texture[par1];
         else if(par1 == 100 || par1 == 101) return texture[par1 - 88];
 
@@ -52,37 +49,37 @@ public class ItemFieldGenerator extends Item{
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void registerIcons(IconRegister par1IconRegister){
-        texture = new Icon[14];
+    public void registerIcons(IIconRegister par1IconRegister){
+        texture = new IIcon[14];
         for(int i = 0; i < 14; i++) {
             texture[i] = par1IconRegister.registerIcon("minesweeperMod:ItemFieldGenerator" + i);
         }
     }
 
     @Override
-    public String getItemDisplayName(ItemStack itemstack){
+    public String getUnlocalizedName(ItemStack itemstack){
         int i = itemstack.getItemDamage();
-        if(i == 100) return "Tutorial Generator";
-        if(i == 101) return "Advanced Tutorial Generator";
+        if(i == 100) return super.getUnlocalizedName(itemstack) + ".tutorial";
+        if(i == 101) return super.getUnlocalizedName(itemstack) + ".advancedTutorial";
         String size;
         if(i < 4) {
-            size = "Small ";
+            size = "small";
         } else if(i < 8) {
-            size = "Medium ";
+            size = "medium";
         } else {
-            size = "Big ";
+            size = "big";
         }
         String difficulty;
         if(i % 4 == 0) {
-            difficulty = "Easy ";
+            difficulty = "Easy";
         } else if(i % 4 == 1) {
-            difficulty = "Normal ";
+            difficulty = "Normal";
         } else if(i % 4 == 2) {
-            difficulty = "Hard ";
+            difficulty = "Hard";
         } else {
-            difficulty = "Hardcore ";
+            difficulty = "Hardcore";
         }
-        return size + difficulty + "Field Generator";
+        return super.getUnlocalizedName(itemstack) + "." + size + difficulty;
     }
 
     @Override
@@ -115,27 +112,24 @@ public class ItemFieldGenerator extends Item{
         if(i == 100 || i == 101) return;
         String size;
         if(i < 4) {
-            size = "\u00a7fSmall: 10x10";
+            size = "item.fieldGenerator.tooltip.small";
         } else if(i < 8) {
-            size = "\u00a78Medium: 20x20";
+            size = "item.fieldGenerator.tooltip.medium";
         } else {
-            size = "\u00a7cBig: 40x40";
+            size = "item.fieldGenerator.tooltip.big";
         }
-        list.add(size);
+        list.add(StatCollector.translateToLocal(size));
         String difficulty;
         if(i % 4 == 0) {
-            difficulty = "\u00a7eEasy: 1 bomb per 10 tiles average";
-            list.add(difficulty);
+            difficulty = "item.fieldGenerator.tooltip.easy";
         } else if(i % 4 == 1) {
-            difficulty = "\u00a76Normal: 1 bomb per 7 tiles average";
-            list.add(difficulty);
+            difficulty = "item.fieldGenerator.tooltip.normal";
         } else if(i % 4 == 2) {
-            difficulty = "\u00a7cHard: 1 bomb per 5 tiles average";
-            list.add(difficulty);
+            difficulty = "item.fieldGenerator.tooltip.hard";
         } else {
-            difficulty = "\u00a74Hardcore: 1 bomb per 5 tiles average,";
-            list.add(difficulty);
-            list.add("\u00a74all mines explode on failure");
+            difficulty = "item.fieldGenerator.tooltip.hardcore2";
+            list.add(StatCollector.translateToLocal("item.fieldGenerator.tooltip.hardcore"));
         }
+        list.add(StatCollector.translateToLocal(difficulty));
     }
 }
