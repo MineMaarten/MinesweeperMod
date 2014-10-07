@@ -55,7 +55,7 @@ public class FieldStatHandler{
                 } else if(player.ticksExisted % 20 != 0) {
                     isTriggeredThisTick = false;
                 }
-                ScaledResolution sr = new ScaledResolution(minecraft.gameSettings, minecraft.displayWidth, minecraft.displayHeight);
+                ScaledResolution sr = new ScaledResolution(minecraft, minecraft.displayWidth, minecraft.displayHeight);
                 GL11.glDepthMask(false);
                 GL11.glDisable(GL11.GL_CULL_FACE);
                 GL11.glDisable(GL11.GL_TEXTURE_2D);

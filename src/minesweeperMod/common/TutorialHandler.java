@@ -356,7 +356,7 @@ public class TutorialHandler{
     }
 
     private void sendChatToNearbyPlayers(String chatMessage){
-        AxisAlignedBB bbBox = AxisAlignedBB.getAABBPool().getAABB(baseX - 5, baseY - 5, baseZ - 5, baseX + 13, baseY + 8, baseZ + 13);
+        AxisAlignedBB bbBox = AxisAlignedBB.getBoundingBox(baseX - 5, baseY - 5, baseZ - 5, baseX + 13, baseY + 8, baseZ + 13);
         List<EntityPlayer> players = world.getEntitiesWithinAABB(EntityPlayer.class, bbBox);
         for(int i = 0; i < players.size(); i++) {
             players.get(i).addChatComponentMessage(new ChatComponentTranslation(chatMessage, new Object[0]));
@@ -364,7 +364,7 @@ public class TutorialHandler{
     }
 
     private void addAchievementToNearbyPlayers(String achievementName){
-        AxisAlignedBB bbBox = AxisAlignedBB.getAABBPool().getAABB(baseX - 5, baseY - 5, baseZ - 5, baseX + 13, baseY + 8, baseZ + 13);
+        AxisAlignedBB bbBox = AxisAlignedBB.getBoundingBox(baseX - 5, baseY - 5, baseZ - 5, baseX + 13, baseY + 8, baseZ + 13);
         List<EntityPlayer> players = world.getEntitiesWithinAABB(EntityPlayer.class, bbBox);
         for(int i = 0; i < players.size(); i++) {
             players.get(i).triggerAchievement(MinesweeperUtils.getAchieveFromName(achievementName));
