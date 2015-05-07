@@ -40,7 +40,7 @@ public class ForgeEventHandler{
     		return false;
     	}
     	Item item = equipped.getItem();
-    	if (item == Items.diamond_shovel || item == Items.golden_sword || item == Items.iron_sword || item == Items.stone_sword || item == Items.wooden_sword) {
+    	if (item == Items.diamond_sword || item == Items.golden_sword || item == Items.iron_sword || item == Items.stone_sword || item == Items.wooden_sword) {
     		return true;
     	}
     	return false;
