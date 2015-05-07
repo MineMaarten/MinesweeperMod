@@ -1,5 +1,7 @@
 package minesweeperMod.common;
 
+import java.io.File;
+
 import minesweeperMod.common.network.PacketPipeline;
 import minesweeperMod.common.network.PacketSpawnParticle;
 import net.minecraft.block.Block;
@@ -14,6 +16,7 @@ import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraftforge.common.AchievementPage;
 import net.minecraftforge.common.ChestGenHooks;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import cpw.mods.fml.common.FMLCommonHandler;
@@ -34,7 +37,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
  * @license Lesser GNU Public License v3 (http://www.gnu.org/licenses/lgpl.html)
  */
 // TODO increase version
-@Mod(modid = Constants.MOD_ID, name = "Minesweeper Mod", version = "1.4.6")
+@Mod(modid = Constants.MOD_ID, name = "Minesweeper Mod", version = "1.4.8")
 public class MinesweeperMod{
 
     @SidedProxy(clientSide = "minesweeperMod.client.ClientProxyMinesweeper", serverSide = "minesweeperMod.common.CommonProxyMinesweeper")
@@ -65,12 +68,15 @@ public class MinesweeperMod{
 
     public static boolean configEnableGeneratorRecipes;
     public static boolean configEnableDetectorRecipe;
+    
+    public static File configFile;
 
     public static final PacketPipeline packetPipeline = new PacketPipeline();
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event){
-        Configuration config = new Configuration(event.getSuggestedConfigurationFile());
+    	configFile = event.getSuggestedConfigurationFile();
+        Configuration config = new Configuration(configFile);
         config.load();
 
         // general
@@ -122,6 +128,54 @@ public class MinesweeperMod{
         property.comment = "If true the flag model will be rendered if you flag a tile.";
         configRenderFlag = property.getBoolean(false);
 
+        StringBuilder sb = new StringBuilder();
+        sb.append("Loot table property names are the minimum number of tiles cleared to be eligible for the reward tier. \n");
+        sb.append("At least one tier is required and there is no limit to the number of tiers allowed.\n");
+        sb.append("Syntax for rewards: \n\n");
+        sb.append("weight;modid:item_name:meta:min_stack_size:max_stack_size[;modid:item_name:meta:min_stack_size:max_stack_size[...]]\n\n");
+        sb.append("weight: determins the probablity of the reward within the tier, a higher value indicates a higher chance of the reward.\n\n");
+        sb.append("An example reward tier giving between 1 and 3 iron blocks and between 2 and 8 iron ingots would look like the following: \n\n");
+        sb.append("1;minecraft:iron_block:0:1:3;minecraft:iron_ingot:0:2:8");
+        String lootTableConfigComment = sb.toString();
+        
+        // Loot tables
+        if (!isLootTableConfigured(config, Constants.LOOT_TABLE_HARDCORE_CATEGORY)) {
+        	configLootTable(config, Constants.LOOT_TABLE_HARDCORE_CATEGORY, 51, Blocks.iron_block);
+        	configLootTable(config, Constants.LOOT_TABLE_HARDCORE_CATEGORY, 101, Blocks.gold_block);
+        	configLootTable(config, Constants.LOOT_TABLE_HARDCORE_CATEGORY, 201, Blocks.diamond_block);
+        	configLootTable(config, Constants.LOOT_TABLE_HARDCORE_CATEGORY, 301, Blocks.emerald_block);
+        	configLootTable(config, Constants.LOOT_TABLE_HARDCORE_CATEGORY, 501, Items.nether_star);
+        }
+        ConfigCategory configCategory = config.getCategory(Constants.LOOT_TABLE_HARDCORE_CATEGORY);
+    	configCategory.setComment(lootTableConfigComment);
+        if (!isLootTableConfigured(config, Constants.LOOT_TABLE_HARD_CATEGORY)) {
+        	configLootTable(config, Constants.LOOT_TABLE_HARD_CATEGORY, 51, Items.glowstone_dust, 3, 5);
+        	configLootTable(config, Constants.LOOT_TABLE_HARD_CATEGORY, 101, Blocks.glowstone, 3, 5);
+        	configLootTable(config, Constants.LOOT_TABLE_HARD_CATEGORY, 201, Items.diamond, 3, 5);
+        	configLootTable(config, Constants.LOOT_TABLE_HARD_CATEGORY, 301, Items.emerald, 3, 5);
+        	configLootTable(config, Constants.LOOT_TABLE_HARD_CATEGORY, 501, Items.skull, 1, 1, 1);
+        }
+        configCategory = config.getCategory(Constants.LOOT_TABLE_HARD_CATEGORY);
+    	configCategory.setComment(lootTableConfigComment);
+        if (!isLootTableConfigured(config, Constants.LOOT_TABLE_NORMAL_CATEGORY)) {
+        	configLootTable(config, Constants.LOOT_TABLE_NORMAL_CATEGORY, 51, Items.gold_ingot, 3, 5);
+        	configLootTable(config, Constants.LOOT_TABLE_NORMAL_CATEGORY, 101, Items.redstone, 3, 5);
+        	configLootTable(config, Constants.LOOT_TABLE_NORMAL_CATEGORY, 201, Items.glowstone_dust, 3, 5);
+        	configLootTable(config, Constants.LOOT_TABLE_NORMAL_CATEGORY, 301, Items.diamond, 3, 5);
+        	configLootTable(config, Constants.LOOT_TABLE_NORMAL_CATEGORY, 501, Items.emerald, 3, 5);
+        }
+        configCategory = config.getCategory(Constants.LOOT_TABLE_NORMAL_CATEGORY);
+    	configCategory.setComment(lootTableConfigComment);
+        if (!isLootTableConfigured(config, Constants.LOOT_TABLE_EASY_CATEGORY)) {
+        	configLootTable(config, Constants.LOOT_TABLE_EASY_CATEGORY, 51, Items.iron_ingot, 1, 3);
+        	configLootTable(config, Constants.LOOT_TABLE_EASY_CATEGORY, 101, Items.gold_ingot, 1, 3);
+        	configLootTable(config, Constants.LOOT_TABLE_EASY_CATEGORY, 201, Items.redstone, 1, 3);
+        	configLootTable(config, Constants.LOOT_TABLE_EASY_CATEGORY, 301, Items.glowstone_dust, 1, 3);
+        	configLootTable(config, Constants.LOOT_TABLE_EASY_CATEGORY, 501, Items.diamond, 1, 3);
+        }
+        configCategory = config.getCategory(Constants.LOOT_TABLE_EASY_CATEGORY);
+    	configCategory.setComment(lootTableConfigComment);
+        
         config.save();// save the configuration file
 
         blockMinesweeper = new BlockMinesweeper(Material.ground).setHardness(3.0F).setResistance(1.0F).setBlockName("minesweeperBlock");// .setCreativeTab(CreativeTabs.tabBlock);
@@ -138,6 +192,43 @@ public class MinesweeperMod{
         achievementRegisters();
     }
 
+    private boolean isLootTableConfigured(Configuration config, String category) {
+    	if (config.hasCategory(category)) {
+    		ConfigCategory configCategory = config.getCategory(category);
+    		if (configCategory.isEmpty()) {
+    			return false;
+    		} else {
+    			return true;
+    		}
+    	} else {
+    		return false;
+    	}
+    }
+    
+    private void configLootTable(Configuration config, String category, int boardSize, Block block) {
+    	configLootTable(config, category, boardSize, block, 1, 1);
+    }
+    
+    private void configLootTable(Configuration config, String category, int boardSize, Block block, int min, int max) {
+    	Item item = Item.getItemFromBlock(block);
+    	configLootTable(config, category, boardSize, item, 0, min, max);
+    }
+    
+    private void configLootTable(Configuration config, String category, int boardSize, Item item) {
+    	configLootTable(config, category, boardSize, item, 0, 1, 1);
+    }
+    
+    private void configLootTable(Configuration config, String category, int boardSize, Item item, int min, int max) {
+    	configLootTable(config, category, boardSize, item, 0, min, max);
+    }
+    
+    private void configLootTable(Configuration config, String category, int boardSize, Item item, int meta, int min, int max) {
+    	String name = Item.itemRegistry.getNameForObject(item);
+    	config.get(category, String.valueOf(boardSize), new String[]{
+    			"1;" + name + ":" + meta + ":" + min + ":" + max
+    	});
+    }
+    
     @EventHandler
     public void load(FMLInitializationEvent event){
         MinecraftForge.EVENT_BUS.register(new ForgeEventHandler());
