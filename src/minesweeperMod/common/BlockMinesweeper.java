@@ -240,6 +240,9 @@ public class BlockMinesweeper extends Block{
         }
 
         String[] rewardConfig = rewardEntry.getValue().getStringList();
+        if (rewardConfig.length == 0) {
+        	return null;
+        }
         Reward[] rewards = new Reward[rewardConfig.length];
         for (int i = 0; i < rewardConfig.length; i++) {
             rewards[i] = new Reward(rewardConfig[i]);
@@ -252,7 +255,7 @@ public class BlockMinesweeper extends Block{
         
         int randomIndex = -1;
         double random = Math.random() * totalWeight;
-        for (int i = 0; i < rewards.length; ++i) {
+        for (int i = 0; i < rewards.length; i++) {
             random -= rewards[i].getWeight();
             if (random <= 0.0d) {
                 randomIndex = i;

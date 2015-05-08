@@ -35,21 +35,4 @@ public class Reward {
 	public int getWeight() {
 		return weight;
 	}
-	
-	private class RewardItem {
-		private String modId;
-		private String itemName;
-		private int meta;
-		private int min;
-		private int max;
-		
-		public RewardItem(String data) {
-			String[] components = data.split(":");
-			modId = components[0];
-			itemName = components[1];
-			meta = Integer.parseInt(components[2]);
-			min = Integer.parseInt(components[3]);
-			max = Integer.parseInt(components[4]);
-		}
-	}
 }
