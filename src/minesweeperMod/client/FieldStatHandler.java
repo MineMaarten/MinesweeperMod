@@ -31,7 +31,6 @@ public class FieldStatHandler{
     public static int x;//coords of the last clicked minesweeper tile.
     public static int y;
     public static int z;
-    public static boolean forceUpdateOnPacket = false;
     public static boolean forceUpdate = true;
     private int bombCount;
     private double tileBombRatio;
@@ -43,7 +42,7 @@ public class FieldStatHandler{
 
     @SubscribeEvent
     public void tickEnd(TickEvent.RenderTickEvent event){
-        if(MinesweeperMod.instance.configStatEnabled) {
+        if(MinesweeperMod.instance.configStatEnabled && event.phase == TickEvent.Phase.END) {
             Minecraft minecraft = FMLClientHandler.instance().getClient();
             EntityPlayer player = minecraft.thePlayer;
             if(player != null) {

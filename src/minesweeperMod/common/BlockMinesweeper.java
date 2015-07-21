@@ -73,7 +73,7 @@ public class BlockMinesweeper extends Block{
             FieldStatHandler.x = x;
             FieldStatHandler.y = y;
             FieldStatHandler.z = z;
-            FieldStatHandler.forceUpdateOnPacket = true;
+            FieldStatHandler.forceUpdate = true;
         } else {
             int meta = world.getBlockMetadata(x, y, z);
             if(MinesweeperUtils.isTileClosed(meta) && (player.getCurrentEquippedItem() == null || player.getCurrentEquippedItem().getItem() != MinesweeperMod.itemMineDetector)) {
@@ -95,7 +95,7 @@ public class BlockMinesweeper extends Block{
             FieldStatHandler.x = x;
             FieldStatHandler.y = y;
             FieldStatHandler.z = z;
-            FieldStatHandler.forceUpdateOnPacket = true;
+            FieldStatHandler.forceUpdate = true;
         } else {
             int meta = world.getBlockMetadata(x, y, z);
             if(MinesweeperUtils.isTileClosed(meta)) {

@@ -6,6 +6,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import cpw.mods.fml.client.FMLClientHandler;
 import cpw.mods.fml.client.registry.RenderingRegistry;
+import cpw.mods.fml.common.FMLCommonHandler;
 
 /**
  * Minesweeper Mod
@@ -23,9 +24,8 @@ public class ClientProxyMinesweeper extends CommonProxyMinesweeper{
 
     @Override
     public void registerHandlers(){
-        MinecraftForge.EVENT_BUS.register(new MinesweeperSoundHandler());
         MinecraftForge.EVENT_BUS.register(new MinesweeperDrawBlockHighlightHandler());
-        MinecraftForge.EVENT_BUS.register(new FieldStatHandler());
+        FMLCommonHandler.instance().bus().register(new FieldStatHandler());
     }
 
     @Override
