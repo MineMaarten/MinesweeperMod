@@ -2,7 +2,9 @@ package minesweeperMod.common;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Random;
+import java.util.TreeMap;
 
 import minesweeperMod.client.FieldStatHandler;
 import minesweeperMod.common.network.PacketSpawnParticle;
@@ -13,11 +15,12 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
+import net.minecraftforge.common.config.ConfigCategory;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Property;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -165,7 +168,6 @@ public class BlockMinesweeper extends Block{
 
     public boolean isGameDoneAndReward(World world, int x, int y, int z, EntityPlayer player){
         List<int[]> list = new ArrayList<int[]>();
-        Random rand = new Random();
         getAccessoryTiles(list, world, x, y, z);
         int tileCount = list.size();
         int bombCount = 0;
@@ -181,99 +183,92 @@ public class BlockMinesweeper extends Block{
         }
 
         if(tileCount > 50) player.triggerAchievement(MinesweeperUtils.getAchieveFromName("achieveCleared1"));
-        else return true;
         if(tileCount > 100) player.triggerAchievement(MinesweeperUtils.getAchieveFromName("achieveCleared2"));
         if(tileCount > 200) player.triggerAchievement(MinesweeperUtils.getAchieveFromName("achieveCleared3"));
         if(tileCount > 500) player.triggerAchievement(MinesweeperUtils.getAchieveFromName("achieveCleared4"));
         if(tileCount > 1000) player.triggerAchievement(MinesweeperUtils.getAchieveFromName("achieveCleared5"));
 
         // reward the player depending on how many tiles have been cleared.
-        Item item = null;
-        int itemAmount = 1; // drop default one item.
-        int itemDamage = 0;
         double tileBombRatio = (double)bombCount / (double)tileCount;
         double hardcoreBombPercentage = (double)hardcoreBombCount / (double)bombCount;
-        // TODO improve rewards
+        ItemStack[] iStack = null;
         if(tileBombRatio > 1D / 6D && hardcoreBombPercentage > 0.5D) {
             // hardcore rewards:
             player.triggerAchievement(MinesweeperUtils.getAchieveFromName("achieveDifficulty4"));
-            if(tileCount > 500) {
-                item = Items.nether_star;
-            } else if(tileCount > 300) {
-                item = Item.getItemFromBlock(Blocks.emerald_block);
-            } else if(tileCount > 200) {
-                item = Item.getItemFromBlock(Blocks.diamond_block);
-            } else if(tileCount > 100) {
-                item = Item.getItemFromBlock(Blocks.gold_block);
-            } else if(tileCount > 50) {
-                item = Item.getItemFromBlock(Blocks.iron_block);
-            } else {
-                return true;
-            }
+            iStack = getReward(Constants.LOOT_TABLE_HARDCORE_CATEGORY, tileCount);
         } else if(tileBombRatio > 1D / 6D) {
             // hard rewards:
             player.triggerAchievement(MinesweeperUtils.getAchieveFromName("achieveDifficulty3"));
-            itemAmount = rand.nextInt(3) + 3;// 3 to 5 drops
-            if(tileCount > 500) {
-                item = Items.skull;
-                itemDamage = 1;
-                itemAmount = 1; // one skull drop per.
-            } else if(tileCount > 300) {
-                item = Items.emerald;
-            } else if(tileCount > 200) {
-                item = Items.diamond;
-            } else if(tileCount > 100) {
-                item = Item.getItemFromBlock(Blocks.glowstone);
-            } else if(tileCount > 50) {
-                item = Items.glowstone_dust;
-            } else {
-                return true;
-            }
+            iStack = getReward(Constants.LOOT_TABLE_HARD_CATEGORY, tileCount);
         } else if(tileBombRatio > 1D / 8D) {
             // normal rewards:
             player.triggerAchievement(MinesweeperUtils.getAchieveFromName("achieveDifficulty2"));
-            itemAmount = rand.nextInt(3) + 3;// 3 to 5 drops
-            if(tileCount > 500) {
-                item = Items.emerald;
-            } else if(tileCount > 300) {
-                item = Items.diamond;
-            } else if(tileCount > 200) {
-                item = Items.glowstone_dust;
-            } else if(tileCount > 100) {
-                item = Items.redstone;
-            } else if(tileCount > 50) {
-                item = Items.gold_ingot;
-            } else {
-                return true;
-            }
+            iStack = getReward(Constants.LOOT_TABLE_NORMAL_CATEGORY, tileCount);
         } else {
             // easy rewards:
             player.triggerAchievement(MinesweeperUtils.getAchieveFromName("achieveDifficulty1"));
-            itemAmount = rand.nextInt(3) + 1; // 1 to 3 drops
-            if(tileCount > 500) {
-                item = Items.diamond;
-            } else if(tileCount > 300) {
-                item = Items.glowstone_dust;
-            } else if(tileCount > 200) {
-                item = Items.redstone;
-            } else if(tileCount > 100) {
-                item = Items.gold_ingot;
-            } else if(tileCount > 50) {
-                item = Items.iron_ingot;
-            } else {
-                return true;
+            iStack = getReward(Constants.LOOT_TABLE_EASY_CATEGORY, tileCount);
+        }
+
+        if (iStack == null) {
+            return true;
+        }
+        
+        for (int i = 0; i < iStack.length; i++) {
+	        float var6 = 0.7F;
+	        double var7 = world.rand.nextFloat() * var6 + (1.0F - var6) * 0.5D;
+	        double var9 = world.rand.nextFloat() * var6 + (1.0F - var6) * 0.5D;
+	        double var11 = world.rand.nextFloat() * var6 + (1.0F - var6) * 0.5D;
+	        EntityItem var13 = new EntityItem(world, x + var7, y + 1D + var9, z + var11, iStack[i]);
+	        var13.delayBeforeCanPickup = 10;
+	        world.spawnEntityInWorld(var13);
+        }
+        return true;
+    }
+
+    private ItemStack[] getReward(String difficulty, int tileCount) {
+        Configuration config = new Configuration(MinesweeperMod.configFile);
+        ConfigCategory category = config.getCategory(difficulty);
+        TreeMap<Integer, Property> difficultyRewards = new TreeMap<Integer, Property>();
+        for (Entry<String, Property> entry : category.getValues().entrySet()) {
+            difficultyRewards.put(Integer.parseInt(entry.getKey()), entry.getValue());
+        }
+
+        Entry<Integer, Property> rewardEntry = difficultyRewards.floorEntry(tileCount);
+        if (rewardEntry == null) {
+            return null;
+        }
+
+        String[] rewardConfig = rewardEntry.getValue().getStringList();
+        if (rewardConfig.length == 0) {
+        	return null;
+        }
+        Reward[] rewards = new Reward[rewardConfig.length];
+        for (int i = 0; i < rewardConfig.length; i++) {
+            rewards[i] = new Reward(rewardConfig[i]);
+        }
+        
+        int totalWeight = 0;
+        for (Reward reward : rewards) {
+            totalWeight += reward.getWeight();
+        }
+        
+        int randomIndex = -1;
+        double random = Math.random() * totalWeight;
+        for (int i = 0; i < rewards.length; i++) {
+            random -= rewards[i].getWeight();
+            if (random <= 0.0d) {
+                randomIndex = i;
+                break;
             }
         }
-        ItemStack iStack = new ItemStack(item, itemAmount, itemDamage);
+        if (randomIndex == -1) {
+            return null;
+        }
+        
+        Reward reward = rewards[randomIndex];
 
-        float var6 = 0.7F;
-        double var7 = world.rand.nextFloat() * var6 + (1.0F - var6) * 0.5D;
-        double var9 = world.rand.nextFloat() * var6 + (1.0F - var6) * 0.5D;
-        double var11 = world.rand.nextFloat() * var6 + (1.0F - var6) * 0.5D;
-        EntityItem var13 = new EntityItem(world, x + var7, y + 1D + var9, z + var11, iStack);
-        var13.delayBeforeCanPickup = 10;
-        world.spawnEntityInWorld(var13);
-        return true;
+        return reward.getReward();
     }
 
     public void eraseField(World world, int x, int y, int z, boolean explodeOnHardcore){
