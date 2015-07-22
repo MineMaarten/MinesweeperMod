@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import minesweeperMod.common.BlockMinesweeper.EnumState;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
 /**
@@ -83,17 +85,17 @@ public class FieldGeneratorHandler{
         for(int i = 0; i < levels.get(0); i++) {
             int index = 0;// rand.nextInt(toBeGenerated.size());
             int[] coord = toBeGenerated.get(index);
-            int meta;
+            EnumState state;
             if(itemDamage == 100 || itemDamage == 101) {// tutorial level
-                meta = isTutorialLevelBomb(coord[0] - baseX, coord[1] - baseZ, itemDamage - 100) ? 14 : 9;
+                state = isTutorialLevelBomb(coord[0] - baseX, coord[1] - baseZ, itemDamage - 100) ? EnumState.CLOSED_BOMB : EnumState.CLOSED;
             } else {
                 if(rand.nextInt(difficulty) == 0) {
-                    meta = itemDamage % 4 == 3 ? 12 : 14; // generate hardcore bombs instead of normal bombs.
+                    state = itemDamage % 4 == 3 ? EnumState.CLOSED_BOMB_HARDCORE : EnumState.CLOSED_BOMB; // generate hardcore bombs instead of normal bombs.
                 } else {
-                    meta = 9;
+                    state = EnumState.CLOSED;
                 }
             }
-            world.setBlock(coord[0], baseY, coord[1], MinesweeperMod.blockMinesweeper, meta, 3);
+            world.setBlockState(new BlockPos(coord[0], baseY, coord[1]), MinesweeperMod.blockMinesweeper.getDefaultState().withProperty(BlockMinesweeper.STATE, state));
             toBeGenerated.remove(index);
         }
         levels.remove(0);

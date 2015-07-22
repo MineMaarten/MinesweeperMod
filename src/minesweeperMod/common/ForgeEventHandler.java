@@ -7,7 +7,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 /**
  * Minesweeper Mod
@@ -26,11 +26,12 @@ public class ForgeEventHandler{
     	EntityPlayer player = event.entityPlayer;
     	if (player.capabilities.isCreativeMode) {
     		if (isSword(player.getCurrentEquippedItem())) {
-	    		Block block = player.worldObj.getBlock(event.x, event.y, event.z);
-	    		if(event.action == Action.LEFT_CLICK_BLOCK && block == MinesweeperMod.blockMinesweeper) {
-	        		block.onBlockClicked(player.worldObj, event.x, event.y, event.z, player);
+    			if(event.action == Action.LEFT_CLICK_BLOCK){
+    			Block block = player.worldObj.getBlockState(event.pos).getBlock();
+	    		 if(block == MinesweeperMod.blockMinesweeper) {
+	        		block.onBlockClicked(player.worldObj, event.pos, player);
 	        		event.setCanceled(true);
-	        	}
+	        	}}
     		}
         }
     }

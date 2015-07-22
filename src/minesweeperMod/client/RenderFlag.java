@@ -2,6 +2,7 @@ package minesweeperMod.client;
 
 import minesweeperMod.common.EntityFlag;
 import minesweeperMod.common.MinesweeperMod;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
@@ -20,7 +21,7 @@ public class RenderFlag extends Render{
     private final ResourceLocation texture = new ResourceLocation("minesweepermod:textures/model/ModelFlag.png");
 
     public RenderFlag(){
-        super();
+        super(Minecraft.getMinecraft().getRenderManager());
         model = new ModelFlag();
     }
 

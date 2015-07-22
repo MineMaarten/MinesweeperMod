@@ -1,9 +1,10 @@
 package minesweeperMod.common;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
 /**
@@ -14,20 +15,19 @@ import net.minecraft.world.World;
  */
 
 public class ItemMineDetector extends Item{
-    @Override
+   /* @Override
     public void registerIcons(IIconRegister par1IconRegister){
         itemIcon = par1IconRegister.registerIcon("minesweeperMod:ItemMineDetector");
-    }
+    }*/
 
     @Override
-    public boolean onItemUse(ItemStack IStack, EntityPlayer player, World world, int x, int y, int z, int par7, float par8, float par9, float par10){
-        if(world.getBlock(x, y, z) == MinesweeperMod.blockMinesweeper) {
+    public boolean onItemUse(ItemStack IStack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float par8, float par9, float par10){
+        if(world.getBlockState(pos).getBlock() == MinesweeperMod.blockMinesweeper) {
             if(world.isRemote) {
                 player.addStat(MinesweeperUtils.getAchieveFromName("achieveUseDetector"), 1);
             }
-            int meta = world.getBlockMetadata(x, y, z);
-            if(MinesweeperUtils.isTileBomb(meta)) {
-                world.playSoundEffect(x, y, z, "minesweepermod:minebeep", 1.0F, 1.0F);
+            if(BlockMinesweeper.getState(world.getBlockState(pos)).bomb) {
+                world.playSoundEffect(pos.getX(),pos.getY(),pos.getZ(), "minesweepermod:minebeep", 1.0F, 1.0F);
             }
             IStack.stackSize--;
             return true;

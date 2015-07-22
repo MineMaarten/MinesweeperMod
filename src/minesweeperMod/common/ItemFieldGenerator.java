@@ -3,16 +3,14 @@ package minesweeperMod.common;
 import java.util.List;
 import java.util.Random;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  * Minesweeper Mod
@@ -22,7 +20,7 @@ import cpw.mods.fml.relauncher.SideOnly;
  */
 
 public class ItemFieldGenerator extends Item{
-    IIcon[] texture;
+  //  IIcon[] texture;
 
     public ItemFieldGenerator(){
         super();
@@ -39,7 +37,7 @@ public class ItemFieldGenerator extends Item{
         subItems.add(new ItemStack(this, 1, 101));
     }
 
-    @Override
+   /* @Override
     public IIcon getIconFromDamage(int par1){
         if(par1 < 12) return texture[par1];
         else if(par1 == 100 || par1 == 101) return texture[par1 - 88];
@@ -54,7 +52,7 @@ public class ItemFieldGenerator extends Item{
         for(int i = 0; i < 14; i++) {
             texture[i] = par1IconRegister.registerIcon("minesweeperMod:ItemFieldGenerator" + i);
         }
-    }
+    }*/
 
     @Override
     public String getUnlocalizedName(ItemStack itemstack){

@@ -1,0 +1,20 @@
+{
+    "variants": {
+        "state=b0": { "model": "minesweepermod:minesweeperBlock0" },
+        "state=b1": { "model": "minesweepermod:minesweeperBlock1" },
+        "state=b2": { "model": "minesweepermod:minesweeperBlock2" },
+        "state=b3": { "model": "minesweepermod:minesweeperBlock3" },
+        "state=b4": { "model": "minesweepermod:minesweeperBlock4" },
+        "state=b5": { "model": "minesweepermod:minesweeperBlock5" },
+        "state=b6": { "model": "minesweepermod:minesweeperBlock6" },
+        "state=b7": { "model": "minesweepermod:minesweeperBlock7" },
+        "state=b8": { "model": "minesweepermod:minesweeperBlock8" },
+        "state=closed": { "model": "minesweepermod:minesweeperBlockClosed" },
+        "state=closed_bomb": { "model": "minesweepermod:minesweeperBlockClosed" },
+        "state=closed_bomb_hardcore": { "model": "minesweepermod:minesweeperBlockClosed" },
+        "state=opened_bomb": { "model": "minesweepermod:minesweeperBlockBomb" },
+        "state=closed_flagged": { "model": "minesweepermod:minesweeperBlockFlagged" },
+        "state=closed_bomb_flagged": { "model": "minesweepermod:minesweeperBlockFlagged" },
+        "state=closed_bomb_hardcore_flagged": { "model": "minesweepermod:minesweeperBlockFlagged" }
+    }
+}

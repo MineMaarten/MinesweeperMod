@@ -1,23 +1,24 @@
 package minesweeperMod.client;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import minesweeperMod.common.BlockMinesweeper;
 import minesweeperMod.common.MinesweeperMod;
-import minesweeperMod.common.MinesweeperUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.client.FMLClientHandler;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * Minesweeper Mod
@@ -28,9 +29,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class FieldStatHandler{
-    public static int x;//coords of the last clicked minesweeper tile.
-    public static int y;
-    public static int z;
+    public static BlockPos pos;//coords of the last clicked minesweeper tile.
     public static boolean forceUpdate = true;
     private int bombCount;
     private double tileBombRatio;
@@ -67,18 +66,19 @@ public class FieldStatHandler{
                     minesweeperStat.setMinDimensionsAndReset(0, 0);
                 }
                 List<String> textList = new ArrayList<String>();
-                if(world.getBlock(x, y, z) == MinesweeperMod.blockMinesweeper) {
+                if(pos != null && world.getBlockState(pos).getBlock() == MinesweeperMod.blockMinesweeper) {
                     minesweeperStat.openWindow();
                     if(shouldUpdate || forceUpdate) {
-                        List<int[]> tiles = new ArrayList<int[]>();
-                        ((BlockMinesweeper)MinesweeperMod.blockMinesweeper).getAccessoryTiles(tiles, world, x, y, z);
+                        Set<BlockPos> tiles = new HashSet<BlockPos>();
+                        ((BlockMinesweeper)MinesweeperMod.blockMinesweeper).getAccessoryTiles(tiles, world, pos);
                         flagCount = 0;
                         bombCount = 0;
                         int hardcoreBombCount = 0;
-                        for(int[] tile : tiles) {
-                            if(MinesweeperUtils.isTileBomb(world.getBlockMetadata(tile[0], tile[1], tile[2]))) bombCount++;
-                            if(MinesweeperUtils.isTileFlagged(world.getBlockMetadata(tile[0], tile[1], tile[2]))) flagCount++;
-                            if(MinesweeperUtils.isTileHardcoreBomb(world.getBlockMetadata(tile[0], tile[1], tile[2]))) hardcoreBombCount++;
+                        for(BlockPos tile : tiles) {
+                        	BlockMinesweeper.EnumState state = BlockMinesweeper.getState(world.getBlockState(tile));
+                            if(state.bomb) bombCount++;
+                            if(state.flagged) flagCount++;
+                            if(state.hardcoreBomb) hardcoreBombCount++;
 
                         }
                         tileBombRatio = (double)bombCount / (double)tiles.size();
@@ -87,9 +87,7 @@ public class FieldStatHandler{
                         if(forceUpdate) statHoldTimer = MinesweeperMod.instance.configStatDuration;
                         forceUpdate = false;
                         if(statHoldTimer <= 0) {
-                            x = 0;
-                            y = 0;
-                            z = 0;
+                            pos = null;
                         }
                     }
                     textList.add("   Mines: " + bombCount);
@@ -140,7 +138,7 @@ public class FieldStatHandler{
                 }
 
                 minesweeperStat.updateResolution(xPos, yPos);
-                minesweeperStat.render(minecraft.fontRenderer, textList, 0);
+                minesweeperStat.render(minecraft.fontRendererObj, textList, 0);
                 GL11.glPopMatrix();
                 GL11.glEnable(GL11.GL_CULL_FACE);
                 GL11.glDepthMask(true);

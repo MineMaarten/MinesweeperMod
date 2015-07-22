@@ -5,11 +5,11 @@ import java.util.List;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * Minesweeper Mod
@@ -109,13 +109,14 @@ public class GuiAnimatedStat{
         GL11.glDisable(GL11.GL_TEXTURE_2D);
         GL11.glLineWidth(3.0F);
         GL11.glColor4d(0, 0, 0, 1);
-        Tessellator tess = Tessellator.instance;
+        WorldRenderer tess = Tessellator.getInstance().getWorldRenderer();
         tess.startDrawing(GL11.GL_LINE_LOOP);
         tess.addVertex(baseX, affectedY, zLevel);
         tess.addVertex(baseX + width, affectedY, zLevel);
         tess.addVertex(baseX + width, affectedY + height, zLevel);
         tess.addVertex(baseX, affectedY + height, zLevel);
-        tess.draw();
+        //tess.draw();
+        Tessellator.getInstance().draw();
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         if(leftSided) width *= -1;
         // if done expanding, draw the information

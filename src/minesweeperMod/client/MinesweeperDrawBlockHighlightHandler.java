@@ -4,13 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.client.event.DrawBlockHighlightEvent;
-import net.minecraftforge.common.util.ForgeDirection;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import org.lwjgl.opengl.GL11;
-
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 
 /**
  * Minesweeper Mod
@@ -59,12 +58,12 @@ public class MinesweeperDrawBlockHighlightHandler{
         GL11.glDisable(GL11.GL_CULL_FACE);
 
         for(int i = 4; i < 5; i++) {
-            ForgeDirection forgeDir = ForgeDirection.getOrientation(i);
+
             int zCorrection = i == 2 ? -1 : 1;
             GL11.glPushMatrix();
             GL11.glTranslated(-iPX + x + xShift, -iPY + y + yShift, -iPZ + z + zShift);
             GL11.glScalef(1F * xScale, 1F * yScale, 1F * zScale);
-            GL11.glRotatef(90, forgeDir.offsetX, forgeDir.offsetY, forgeDir.offsetZ);
+            GL11.glRotatef(90, -1, 0, 0);
             GL11.glTranslated(0, 0, 0.5f * zCorrection);
             GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
             drawQuad(-0.5F, -0.5F, 1F, 1F, 0F, tile);
@@ -101,13 +100,14 @@ public class MinesweeperDrawBlockHighlightHandler{
         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         GL11.glColor4f(renderColors.get(tile)[0], renderColors.get(tile)[1], renderColors.get(tile)[2], pulseTransparency);
 
-        Tessellator tessellator = Tessellator.instance;
+        WorldRenderer tessellator = Tessellator.getInstance().getWorldRenderer();
         tessellator.startDrawingQuads();
         tessellator.addVertex(x + 0F, y + height, zLevel);
         tessellator.addVertex(x + width, y + height, zLevel);
         tessellator.addVertex(x + width, y + 0F, zLevel);
         tessellator.addVertex(x + 0F, y + 0F, zLevel);
-        tessellator.draw();
+        //tessellator.draw();
+        Tessellator.getInstance().draw();
 
         GL11.glDisable(GL11.GL_BLEND);
         GL11.glEnable(GL11.GL_TEXTURE_2D);

@@ -2,12 +2,18 @@ package minesweeperMod.common;
 
 import java.util.Random;
 
+import minesweeperMod.common.BlockMinesweeper.EnumState;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockStoneBrick;
+import net.minecraft.block.BlockTorch;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.ChunkProviderFlat;
-import cpw.mods.fml.common.IWorldGenerator;
+import net.minecraftforge.fml.common.IWorldGenerator;
 
 /**
  * Minesweeper Mod
@@ -22,7 +28,7 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
     @Override
     public void generate(Random random, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider){
         if(!(chunkGenerator instanceof ChunkProviderFlat)) { //don't generate on flatworlds
-            switch(world.provider.dimensionId){
+            switch(world.provider.getDimensionId()){
                 case 0:
                     generateSurface(world, random, chunkX * 16, chunkZ * 16);
                     break;
@@ -100,36 +106,35 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
 
         generateMinefieldTiles(world, baseX + 1, baseZ + 1, baseY, maxX - 1, maxZ - 1, difficulty);
         if(difficulty == 3) // when generating above a lava lake (probably)
-        fillWithMetadataBlocks(world, baseX, baseY - 1, baseZ, maxX, baseY - 1, maxZ, Blocks.netherrack, 0);
-        fillWithMetadataBlocks(world, baseX + 1, baseY + 1, baseZ + 1, maxX - 1, baseY + 5, maxZ - 1, Blocks.air, 0);// clear some space
-        fillWithMetadataBlocks(world, baseX, baseY + 6, baseZ, maxX, baseY + 6, maxZ, getDifficultyBlock(difficulty), getDifficultyMetadata(difficulty));// roof
-        fillWithMetadataBlocks(world, baseX, baseY, baseZ, maxX, baseY + 6, baseZ, getDifficultyBlock(difficulty), getDifficultyMetadata(difficulty));// -Z wall
-        fillWithMetadataBlocks(world, baseX, baseY, maxZ, maxX, baseY + 6, maxZ, getDifficultyBlock(difficulty), getDifficultyMetadata(difficulty));// +Z wall
-        fillWithMetadataBlocks(world, baseX, baseY, baseZ, baseX, baseY + 6, maxZ, getDifficultyBlock(difficulty), getDifficultyMetadata(difficulty));// -X wall
-        fillWithMetadataBlocks(world, maxX, baseY, baseZ, maxX, baseY + 6, maxZ, getDifficultyBlock(difficulty), getDifficultyMetadata(difficulty));// +X wall
+        fillWithMetadataBlocks(world, baseX, baseY - 1, baseZ, maxX, baseY - 1, maxZ, Blocks.netherrack);
+        fillWithMetadataBlocks(world, baseX + 1, baseY + 1, baseZ + 1, maxX - 1, baseY + 5, maxZ - 1, Blocks.air);// clear some space
+        fillWithMetadataBlocks(world, baseX, baseY + 6, baseZ, maxX, baseY + 6, maxZ, getDifficultyBlock(difficulty));// roof
+        fillWithMetadataBlocks(world, baseX, baseY, baseZ, maxX, baseY + 6, baseZ, getDifficultyBlock(difficulty));// -Z wall
+        fillWithMetadataBlocks(world, baseX, baseY, maxZ, maxX, baseY + 6, maxZ, getDifficultyBlock(difficulty));// +Z wall
+        fillWithMetadataBlocks(world, baseX, baseY, baseZ, baseX, baseY + 6, maxZ, getDifficultyBlock(difficulty));// -X wall
+        fillWithMetadataBlocks(world, maxX, baseY, baseZ, maxX, baseY + 6, maxZ, getDifficultyBlock(difficulty));// +X wall
         if(difficulty == 2) {
-            fillWithMetadataBlocks(world, middleX - oddX - 1, baseY, baseZ, middleX + 2, baseY + 5, baseZ, Blocks.stonebrick, 3);// -Z chiseled stone doorway
-            fillWithMetadataBlocks(world, middleX - oddX - 1, baseY, maxZ, middleX + 2, baseY + 5, maxZ, Blocks.stonebrick, 3);// +Z doorway
-            fillWithMetadataBlocks(world, baseX, baseY, middleZ - oddZ - 1, baseX, baseY + 5, middleZ + 2, Blocks.stonebrick, 3);// -X doorway
-            fillWithMetadataBlocks(world, maxX, baseY, middleZ - oddZ - 1, maxX, baseY + 5, middleZ + 2, Blocks.stonebrick, 3);// +X doorway
+            fillWithMetadataBlocks(world, middleX - oddX - 1, baseY, baseZ, middleX + 2, baseY + 5, baseZ, Blocks.stonebrick.getDefaultState().withProperty(BlockStoneBrick.VARIANT, BlockStoneBrick.EnumType.CHISELED));// -Z chiseled stone doorway
+            fillWithMetadataBlocks(world, baseX, baseY, middleZ - oddZ - 1, baseX, baseY + 5, middleZ + 2, Blocks.stonebrick.getDefaultState().withProperty(BlockStoneBrick.VARIANT, BlockStoneBrick.EnumType.CHISELED));// -X doorway
+            fillWithMetadataBlocks(world, maxX, baseY, middleZ - oddZ - 1, maxX, baseY + 5, middleZ + 2, Blocks.stonebrick.getDefaultState().withProperty(BlockStoneBrick.VARIANT, BlockStoneBrick.EnumType.CHISELED));// +X doorway
         }
 
-        fillWithMetadataBlocks(world, middleX - oddX, baseY + 1, baseZ, middleX + 1, baseY + 4, baseZ, Blocks.air, 0);// -Z doorway
-        fillWithMetadataBlocks(world, middleX - oddX, baseY + 1, maxZ, middleX + 1, baseY + 4, maxZ, Blocks.air, 0);// +Z doorway
-        fillWithMetadataBlocks(world, baseX, baseY + 1, middleZ - oddZ, baseX, baseY + 4, middleZ + 1, Blocks.air, 0);// -X doorway
-        fillWithMetadataBlocks(world, maxX, baseY + 1, middleZ - oddZ, maxX, baseY + 4, middleZ + 1, Blocks.air, 0);// +X doorway
+        fillWithMetadataBlocks(world, middleX - oddX, baseY + 1, baseZ, middleX + 1, baseY + 4, baseZ, Blocks.air);// -Z doorway
+        fillWithMetadataBlocks(world, middleX - oddX, baseY + 1, maxZ, middleX + 1, baseY + 4, maxZ, Blocks.air);// +Z doorway
+        fillWithMetadataBlocks(world, baseX, baseY + 1, middleZ - oddZ, baseX, baseY + 4, middleZ + 1, Blocks.air);// -X doorway
+        fillWithMetadataBlocks(world, maxX, baseY + 1, middleZ - oddZ, maxX, baseY + 4, middleZ + 1, Blocks.air);// +X doorway
 
-        world.setBlock(middleX - 1 - oddX, baseY + 3, baseZ + 1, Blocks.torch, 3, 3);
-        world.setBlock(middleX + 2, baseY + 3, baseZ + 1, Blocks.torch, 3, 3);
+        setTorch(world,middleX - 1 - oddX, baseY + 3, baseZ + 1, EnumFacing.SOUTH);
+        setTorch(world,middleX + 2, baseY + 3, baseZ + 1, EnumFacing.SOUTH);
 
-        world.setBlock(middleX - 1 - oddX, baseY + 3, maxZ - 1, Blocks.torch, 4, 3);
-        world.setBlock(middleX + 2, baseY + 3, maxZ - 1, Blocks.torch, 4, 3);
+        setTorch(world,middleX - 1 - oddX, baseY + 3, maxZ - 1, EnumFacing.NORTH);
+        setTorch(world,middleX + 2, baseY + 3, maxZ - 1, EnumFacing.NORTH);
 
-        world.setBlock(baseX + 1, baseY + 3, middleZ - 1 - oddZ, Blocks.torch, 1, 3);
-        world.setBlock(baseX + 1, baseY + 3, middleZ + 2, Blocks.torch, 1, 3);
+        setTorch(world,baseX + 1, baseY + 3, middleZ - 1 - oddZ, EnumFacing.EAST);
+        setTorch(world,baseX + 1, baseY + 3, middleZ + 2, EnumFacing.EAST);
 
-        world.setBlock(maxX - 1, baseY + 3, middleZ - 1 - oddZ, Blocks.torch, 2, 3);
-        world.setBlock(maxX - 1, baseY + 3, middleZ + 2, Blocks.torch, 2, 3);
+        setTorch(world,maxX - 1, baseY + 3, middleZ - 1 - oddZ, EnumFacing.WEST);
+        setTorch(world,maxX - 1, baseY + 3, middleZ + 2, EnumFacing.WEST);
 
         /*
          * torch metadata's: 1: X+ 2: X- 3: Z+ 4: Z-
@@ -164,6 +169,10 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
             }
         }
     }
+    
+    private void setTorch(World world, int x, int y, int z, EnumFacing facing){
+    	world.setBlockState(new BlockPos(x,y,z), Blocks.torch.getDefaultState().withProperty(BlockTorch.FACING, facing));
+    }
 
     public void generateCorridor(World world, Random rand, int direction, int minefieldX, int minefieldZ, int minX, int minZ, int maxX, int maxZ, int Y, int difficulty){
         // generate the connecting minefield room first
@@ -187,36 +196,36 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
         }
 
         // generate the actual corridor
-        if(difficulty == 3) fillWithMetadataBlocks(world, minX, Y - 1, minZ, maxX, Y - 1, maxZ, Blocks.netherrack, 0);
+        if(difficulty == 3) fillWithMetadataBlocks(world, minX, Y - 1, minZ, maxX, Y - 1, maxZ, Blocks.netherrack);
         generateMinefieldTiles(world, minX, minZ, Y, maxX, maxZ, difficulty);
-        fillWithMetadataBlocks(world, minX, Y + CORRIDOR_HEIGHT, minZ, maxX, Y + CORRIDOR_HEIGHT, maxZ, getDifficultyBlock(difficulty), getDifficultyMetadata(difficulty));
+        fillWithMetadataBlocks(world, minX, Y + CORRIDOR_HEIGHT, minZ, maxX, Y + CORRIDOR_HEIGHT, maxZ, getDifficultyBlock(difficulty));
 
         if(direction < 2) { // when the corridor is 'moving' on the X-axis
-            fillWithMetadataBlocks(world, minX, Y, minZ, maxX, Y + CORRIDOR_HEIGHT, minZ, getDifficultyBlock(difficulty), getDifficultyMetadata(difficulty));
-            fillWithMetadataBlocks(world, minX, Y, maxZ, maxX, Y + CORRIDOR_HEIGHT, maxZ, getDifficultyBlock(difficulty), getDifficultyMetadata(difficulty));
+            fillWithMetadataBlocks(world, minX, Y, minZ, maxX, Y + CORRIDOR_HEIGHT, minZ, getDifficultyBlock(difficulty));
+            fillWithMetadataBlocks(world, minX, Y, maxZ, maxX, Y + CORRIDOR_HEIGHT, maxZ, getDifficultyBlock(difficulty));
             if(difficulty == 2) {
-                fillWithMetadataBlocks(world, minX, Y + 1, minZ, minX, Y + CORRIDOR_HEIGHT, maxZ, Blocks.stonebrick, 3);
-                fillWithMetadataBlocks(world, maxX, Y + 1, minZ, maxX, Y + CORRIDOR_HEIGHT, maxZ, Blocks.stonebrick, 3);
+                fillWithMetadataBlocks(world, minX, Y + 1, minZ, minX, Y + CORRIDOR_HEIGHT, maxZ, Blocks.stonebrick.getDefaultState().withProperty(BlockStoneBrick.VARIANT, BlockStoneBrick.EnumType.CHISELED));
+                fillWithMetadataBlocks(world, maxX, Y + 1, minZ, maxX, Y + CORRIDOR_HEIGHT, maxZ, Blocks.stonebrick.getDefaultState().withProperty(BlockStoneBrick.VARIANT, BlockStoneBrick.EnumType.CHISELED));
             }
-            fillWithMetadataBlocks(world, maxX + 1, Y + 1, minZ + 1, maxX + 1, Y + CORRIDOR_HEIGHT - 1, maxZ - 1, Blocks.air, 0); // first remove all the torches
-            fillWithMetadataBlocks(world, minX - 1, Y + 1, minZ + 1, maxX, Y + CORRIDOR_HEIGHT - 1, maxZ - 1, Blocks.air, 0);
-            world.setBlock(minX - 1, Y + 3, minZ, Blocks.torch, 2, 3);
-            world.setBlock(minX - 1, Y + 3, maxZ, Blocks.torch, 2, 3);
-            world.setBlock(maxX + 1, Y + 3, minZ, Blocks.torch, 1, 3);
-            world.setBlock(maxX + 1, Y + 3, maxZ, Blocks.torch, 1, 3);
+            fillWithMetadataBlocks(world, maxX + 1, Y + 1, minZ + 1, maxX + 1, Y + CORRIDOR_HEIGHT - 1, maxZ - 1, Blocks.air); // first remove all the torches
+            fillWithMetadataBlocks(world, minX - 1, Y + 1, minZ + 1, maxX, Y + CORRIDOR_HEIGHT - 1, maxZ - 1, Blocks.air);
+            setTorch(world,minX - 1, Y + 3, minZ, EnumFacing.WEST);
+            setTorch(world,minX - 1, Y + 3, maxZ, EnumFacing.WEST);
+            setTorch(world,maxX + 1, Y + 3, minZ, EnumFacing.EAST);
+            setTorch(world,maxX + 1, Y + 3, maxZ, EnumFacing.EAST);
         } else { // 'moving' on the Z-axis
-            fillWithMetadataBlocks(world, minX, Y, minZ, minX, Y + CORRIDOR_HEIGHT, maxZ, getDifficultyBlock(difficulty), getDifficultyMetadata(difficulty));
-            fillWithMetadataBlocks(world, maxX, Y, minZ, maxX, Y + CORRIDOR_HEIGHT, maxZ, getDifficultyBlock(difficulty), getDifficultyMetadata(difficulty));
+            fillWithMetadataBlocks(world, minX, Y, minZ, minX, Y + CORRIDOR_HEIGHT, maxZ, getDifficultyBlock(difficulty));
+            fillWithMetadataBlocks(world, maxX, Y, minZ, maxX, Y + CORRIDOR_HEIGHT, maxZ, getDifficultyBlock(difficulty));
             if(difficulty == 2) {
-                fillWithMetadataBlocks(world, minX, Y + 1, minZ, maxX, Y + CORRIDOR_HEIGHT, minZ, Blocks.stonebrick, 3);
-                fillWithMetadataBlocks(world, minX, Y + 1, maxZ, maxX, Y + CORRIDOR_HEIGHT, maxZ, Blocks.stonebrick, 3);
+                fillWithMetadataBlocks(world, minX, Y + 1, minZ, maxX, Y + CORRIDOR_HEIGHT, minZ, Blocks.stonebrick.getDefaultState().withProperty(BlockStoneBrick.VARIANT, BlockStoneBrick.EnumType.CHISELED));
+                fillWithMetadataBlocks(world, minX, Y + 1, maxZ, maxX, Y + CORRIDOR_HEIGHT, maxZ, Blocks.stonebrick.getDefaultState().withProperty(BlockStoneBrick.VARIANT, BlockStoneBrick.EnumType.CHISELED));
             }
-            fillWithMetadataBlocks(world, minX + 1, Y + 1, maxZ + 1, maxX - 1, Y + CORRIDOR_HEIGHT - 1, maxZ + 1, Blocks.air, 0); // first remove the torches
-            fillWithMetadataBlocks(world, minX + 1, Y + 1, minZ - 1, maxX - 1, Y + CORRIDOR_HEIGHT - 1, maxZ, Blocks.air, 0);
-            world.setBlock(minX, Y + 3, maxZ + 1, Blocks.torch, 3, 3);
-            world.setBlock(maxX, Y + 3, maxZ + 1, Blocks.torch, 3, 3);
-            world.setBlock(minX, Y + 3, minZ - 1, Blocks.torch, 4, 3);
-            world.setBlock(maxX, Y + 3, minZ - 1, Blocks.torch, 4, 3);
+            fillWithMetadataBlocks(world, minX + 1, Y + 1, maxZ + 1, maxX - 1, Y + CORRIDOR_HEIGHT - 1, maxZ + 1, Blocks.air); // first remove the torches
+            fillWithMetadataBlocks(world, minX + 1, Y + 1, minZ - 1, maxX - 1, Y + CORRIDOR_HEIGHT - 1, maxZ, Blocks.air);
+            setTorch(world,minX, Y + 3, maxZ + 1, EnumFacing.SOUTH);
+            setTorch(world,maxX, Y + 3, maxZ + 1,   EnumFacing.SOUTH);
+            setTorch(world,minX, Y + 3, minZ - 1,  EnumFacing.NORTH);
+            setTorch(world,maxX, Y + 3, minZ - 1,  EnumFacing.NORTH);
         }
     }
 
@@ -225,10 +234,10 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
         int middleZ = baseZ + (maxZ - baseZ) / 2;
         for(int i = baseY + 1; i <= baseY + 4; i++) {
             for(int j = 0; j < 2; j++) {
-                if(world.isAirBlock(baseX, i, middleZ + j)) return true;
-                if(world.isAirBlock(maxX, i, middleZ + j)) return true;
-                if(world.isAirBlock(middleX + j, i, baseZ)) return true;
-                if(world.isAirBlock(middleX + j, i, maxZ)) return true;
+                if(world.isAirBlock(new BlockPos(baseX, i, middleZ + j))) return true;
+                if(world.isAirBlock(new BlockPos(maxX, i, middleZ + j))) return true;
+                if(world.isAirBlock(new BlockPos(middleX + j, i, baseZ))) return true;
+                if(world.isAirBlock(new BlockPos(middleX + j, i, maxZ))) return true;
             }
         }
         return false;
@@ -247,15 +256,15 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
         }
     }
 
-    private int getDifficultyMetadata(int difficulty){
-        return 0;
+    private void fillWithMetadataBlocks(World world, int minX, int minY, int minZ, int maxX, int maxY, int maxZ, Block block){
+    	fillWithMetadataBlocks(world,minX,minY,minZ,maxX,maxY,maxZ,block.getDefaultState());
     }
-
-    private void fillWithMetadataBlocks(World world, int minX, int minY, int minZ, int maxX, int maxY, int maxZ, Block block, int metadata){
-        for(int i = minX; i <= maxX; i++) {
+    	
+    	 private void fillWithMetadataBlocks(World world, int minX, int minY, int minZ, int maxX, int maxY, int maxZ, IBlockState state){
+    		   for(int i = minX; i <= maxX; i++) {
             for(int j = minY; j <= maxY; j++) {
                 for(int k = minZ; k <= maxZ; k++) {
-                    world.setBlock(i, j, k, block, metadata, 3);
+                    world.setBlockState(new BlockPos(i,j,k), state);
                 }
             }
         }
@@ -278,13 +287,14 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
         for(int i = minX; i <= maxX; i++) {
             for(int j = minZ; j <= maxZ; j++) {
                 Random rand = new Random();
-                int meta;
+                EnumState state;
                 if(rand.nextInt(tileBombRatio) == 0) {
-                    meta = difficulty == 3 ? 12 : 14; // generate hardcore bombs instead of normal bombs
+                	state = difficulty == 3 ? EnumState.CLOSED_BOMB_HARDCORE : EnumState.CLOSED_BOMB; // generate hardcore bombs instead of normal bombs
                 } else {
-                    meta = 9;
+                	state = EnumState.CLOSED;
                 }
-                world.setBlock(i, Y, j, MinesweeperMod.blockMinesweeper, meta, 3);
+                world.setBlockState(new BlockPos(i, Y, j), MinesweeperMod.blockMinesweeper.getDefaultState().withProperty(BlockMinesweeper.STATE, state));
+                
             }
         }
     }
@@ -297,8 +307,9 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
             currentLevel = 0; // reset the counter
             for(int i = minX; i <= maxX; i++) {
                 for(int j = minZ; j <= maxZ; j++) {
-                    if(!world.isAirBlock(i, Y, j) && !world.getBlock(i, Y, j).isReplaceable(world, i, Y, j)) currentLevel++;
-                    if(world.getBlock(i, Y, j) == Blocks.water) return 0;
+                	BlockPos pos = new BlockPos(i, Y, j);
+                    if(!world.isAirBlock(pos) && !world.getBlockState(pos).getBlock().isReplaceable(world, pos)) currentLevel++;
+                    if(world.getBlockState(pos).getBlock() == Blocks.water) return 0;
                 }
             }
             if(lastLevel < currentLevel - (maxX - minX) * (maxZ - minZ) * 0.9F && Y != 100) { // if the underlying Y level has 90% more blocks then the Y level above call it flat.
@@ -311,7 +322,7 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
     private boolean isCollidingWithMinefield(World world, int minX, int minZ, int maxX, int maxZ, int Y){
         for(int i = minX; i <= maxX; i++) {
             for(int j = minZ; j <= maxZ; j++) {
-                if(world.getBlock(i, Y, j) == MinesweeperMod.blockMinesweeper) return true;
+                if(world.getBlockState(new BlockPos(i, Y, j)).getBlock() == MinesweeperMod.blockMinesweeper) return true;
             }
         }
         return false;

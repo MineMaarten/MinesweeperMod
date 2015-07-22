@@ -1,28 +1,32 @@
 package minesweeperMod.common;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
 import java.util.TreeMap;
 
 import minesweeperMod.client.FieldStatHandler;
+import minesweeperMod.common.network.NetworkHandler;
 import minesweeperMod.common.network.PacketSpawnParticle;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockStoneBrick;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.IStringSerializable;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  * Minesweeper Mod
@@ -33,13 +37,74 @@ import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockMinesweeper extends Block{
     public static final float EXPLOSION_RADIUS = 4.0F;
-    private IIcon[] texture;
+    public static final PropertyEnum STATE = PropertyEnum.create("state",EnumState.class);
+    
+    public enum EnumState implements IStringSerializable{   	
+    	B0, B1, B2, B3,B4,B5,B6,B7,B8,CLOSED(false, false, false),CLOSED_FLAGGED(false, true, false), OPENED_BOMB(true, false, true),CLOSED_BOMB_HARDCORE(false, false, true, true),CLOSED_BOMB_HARDCORE_FLAGGED(false, true,true,true),CLOSED_BOMB(false, false, true),CLOSED_BOMB_FLAGGED(false, true, true);
+    	
+    	public boolean opened = true;
+    	public boolean flagged;
+    	public boolean bomb;
+    	public boolean hardcoreBomb;
+    	
+    	private EnumState(){
+    		
+    	}
+    	
+    	private EnumState(boolean opened, boolean flagged, boolean bomb){
+    		this.opened = opened;
+    		this.flagged = flagged;
+    		this.bomb = bomb;
+    	}
+    	
+    	private EnumState(boolean opened, boolean flagged, boolean bomb, boolean hardcoreBomb){
+    		this(opened, flagged, bomb);
+    		this.hardcoreBomb = hardcoreBomb;
+    	}
+    	
+    	public EnumState toggleFlag(){
+    		for(EnumState otherState : values()){
+    			if(!otherState.opened && otherState.bomb == bomb && otherState.hardcoreBomb == hardcoreBomb && otherState.flagged != flagged){
+    				return otherState;
+    			}
+    		}
+    		throw new IllegalStateException("Can't switch flags for an opened tile");
+    	}
+
+		@Override
+		public String getName() {
+			return name();
+		}
+    }
+  //  private IIcon[] texture;
 
     public BlockMinesweeper(Material par3Material){
         super(par3Material);
     }
+    
+    protected BlockState createBlockState()
+    {
+        return new BlockState(this, STATE);
+    }
+    
+    /**
+     * Convert the given metadata into a BlockState for this Block
+     */
+    public IBlockState getStateFromMeta(int meta)
+    {
+        return this.getDefaultState().withProperty(STATE, EnumState.values()[meta]);
+    }
 
-    @Override
+    /**
+     * Convert the BlockState into the correct metadata value
+     */
+    public int getMetaFromState(IBlockState state)
+    {
+        return ((EnumState)state.getValue(STATE)).ordinal();
+    }
+    
+
+   /* @Override
     @SideOnly(Side.CLIENT)
     public void registerBlockIcons(IIconRegister par1IconRegister){
         texture = new IIcon[12];
@@ -67,22 +132,24 @@ public class BlockMinesweeper extends Block{
          * non-red 12 -->closed tile, with hardcore bomb, not flagged. 13
          * -->closed tile, with hardcore bomb, flagged. 14 -->closed tile, with
          * bomb, not flagged 15 -->closed tile, with bomb, flagged.
-         */
+         *
+    }*/
+    
+    public static EnumState getState(IBlockState state){
+    	return (EnumState)state.getValue(STATE);
     }
 
     @Override
-    public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int par6, float par7, float par8, float par9){
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ){
         if(world.isRemote) {
-            FieldStatHandler.x = x;
-            FieldStatHandler.y = y;
-            FieldStatHandler.z = z;
+            FieldStatHandler.pos = pos;
             FieldStatHandler.forceUpdate = true;
         } else {
-            int meta = world.getBlockMetadata(x, y, z);
-            if(MinesweeperUtils.isTileClosed(meta) && (player.getCurrentEquippedItem() == null || player.getCurrentEquippedItem().getItem() != MinesweeperMod.itemMineDetector)) {
-                setBlockMetadata(world, x, y, z, MinesweeperUtils.isTileFlagged(meta) ? meta - 1 : meta + 1);
-                if(!MinesweeperUtils.isTileFlagged(meta)) {//if we just flagged a tile
-                    EntityFlag flag = new EntityFlag(world, x, y + 1, z);
+        	EnumState s = getState(state);
+            if(!s.opened && (player.getCurrentEquippedItem() == null || player.getCurrentEquippedItem().getItem() != MinesweeperMod.itemMineDetector)) {
+                world.setBlockState(pos, state.withProperty(STATE, s.toggleFlag()));
+                if(!s.flagged) {//if we just flagged a tile
+                    EntityFlag flag = new EntityFlag(world, pos);
                     flag.spawnSmoke();
                     world.spawnEntityInWorld(flag);
                 }
@@ -92,51 +159,53 @@ public class BlockMinesweeper extends Block{
     }
 
     @Override
-    public void onBlockClicked(World world, int x, int y, int z, EntityPlayer player){
-        if(player.posY + player.getEyeHeight() <= y + 1D) return; // don't let the player clear the minefield from the bottom.
+    public void onBlockClicked(World world, BlockPos pos, EntityPlayer player){
+        if(player.posY + player.getEyeHeight() <= pos.getY() + 1D) return; // don't let the player clear the minefield from the bottom.
         if(world.isRemote) {
-            FieldStatHandler.x = x;
-            FieldStatHandler.y = y;
-            FieldStatHandler.z = z;
+            FieldStatHandler.pos = pos;
             FieldStatHandler.forceUpdate = true;
         } else {
-            int meta = world.getBlockMetadata(x, y, z);
-            if(MinesweeperUtils.isTileClosed(meta)) {
-                openTile(world, x, y, z, player);
+            EnumState state = getState(world.getBlockState(pos));
+            if(!state.opened) {
+                openTile(world, pos,state, player);
             } else {
-                if(getSurroundingFlags(world, x, y, z) == meta) {// when the amount of flags is the same as the number of bombs around the clicked block, we should be able to open every other tile surrounding this one.
-                    openSurroundingNonFlags(world, x, y, z, player);
+                if(getSurroundingFlags(world, pos) == state.ordinal()) {// when the amount of flags is the same as the number of bombs around the clicked block, we should be able to open every other tile surrounding this one.
+                    openSurroundingNonFlags(world, pos, player);
                 }
             }
-            if(isGameDoneAndReward(world, x, y, z, player)) {
-                eraseField(world, x, y, z, false);
+            if(isGameDoneAndReward(world, pos, player)) {
+                eraseField(world, pos, false);
             }
         }
     }
 
-    private void openTile(World world, int x, int y, int z, EntityPlayer player){
-        if(MinesweeperUtils.isTileBomb(world.getBlockMetadata(x, y, z))) {
-            eraseField(world, x, y, z, true);
-            world.createExplosion(null, (double)x + 0.5F, (double)y + 1.5F, (double)z + 0.5F, EXPLOSION_RADIUS, true);
+    private void openTile(World world, BlockPos pos, EnumState state, EntityPlayer player){
+        if(state.bomb) {
+            eraseField(world, pos, true);
+            world.createExplosion(null, (double)pos.getX() + 0.5F, (double)pos.getY() + 1.5F, (double)pos.getZ() + 0.5F, EXPLOSION_RADIUS, true);
         } else {
-            int bombCount = getSurroundingBombs(world, x, y, z);
+            int bombCount = getSurroundingBombs(world, pos);
             if(bombCount == 7) {
                 player.triggerAchievement(MinesweeperUtils.getAchieveFromName("achieve7"));
             } else if(bombCount == 8) {
                 player.triggerAchievement(MinesweeperUtils.getAchieveFromName("achieve8"));
             }
-            setBlockMetadata(world, x, y, z, bombCount);
+            world.setBlockState(pos, world.getBlockState(pos).withProperty(STATE, EnumState.values()[bombCount]));
             if(bombCount == 0) {
-                openSurroundingNonFlags(world, x, y, z, player);
+                openSurroundingNonFlags(world, pos, player);
             }
         }
     }
 
-    private int getSurroundingBombs(World world, int x, int y, int z){
+    private int getSurroundingBombs(World world, BlockPos pos){
+    	int x = pos.getX();
+    	int y = pos.getY();
+    	int z = pos.getZ();
         int bombCount = 0;
         for(int i = x - 1; i <= x + 1; i++) {
             for(int j = z - 1; j <= z + 1; j++) {
-                if(world.getBlock(i, y, j) == this && MinesweeperUtils.isTileBomb(world.getBlockMetadata(i, y, j))) {
+            	IBlockState state = world.getBlockState(new BlockPos(i, y,j));
+                if(state.getBlock() == this && getState(state).bomb) {
                     bombCount++;
                 }
             }
@@ -144,11 +213,15 @@ public class BlockMinesweeper extends Block{
         return bombCount;
     }
 
-    private int getSurroundingFlags(World world, int x, int y, int z){
+    private int getSurroundingFlags(World world, BlockPos pos){
+    	int x = pos.getX();
+    	int y = pos.getY();
+    	int z = pos.getZ();
         int flagCount = 0;
         for(int i = x - 1; i <= x + 1; i++) {
             for(int j = z - 1; j <= z + 1; j++) {
-                if(world.getBlock(i, y, j) == this && MinesweeperUtils.isTileFlagged(world.getBlockMetadata(i, y, j))) {
+            	IBlockState state = world.getBlockState(new BlockPos(i, y,j));
+                if(state.getBlock() == this && getState(state).flagged) {
                     flagCount++;
                 }
             }
@@ -156,30 +229,35 @@ public class BlockMinesweeper extends Block{
         return flagCount;
     }
 
-    private void openSurroundingNonFlags(World world, int x, int y, int z, EntityPlayer player){
+    private void openSurroundingNonFlags(World world, BlockPos pos, EntityPlayer player){
+    	int x = pos.getX();
+    	int y = pos.getY();
+    	int z = pos.getZ();
         for(int i = x - 1; i <= x + 1; i++) {
             for(int j = z - 1; j <= z + 1; j++) {
-                if(world.getBlock(i, y, j) == this && !MinesweeperUtils.isTileFlagged(world.getBlockMetadata(i, y, j)) && MinesweeperUtils.isTileClosed(world.getBlockMetadata(i, y, j))) {
-                    openTile(world, i, y, j, player);
+            	BlockPos localPos = new BlockPos(i, y,j);
+            	IBlockState state = world.getBlockState(localPos);
+                if(state.getBlock() == this && !getState(state).flagged && !getState(state).opened) {
+                    openTile(world, localPos, getState(state), player);
                 }
             }
         }
     }
 
-    public boolean isGameDoneAndReward(World world, int x, int y, int z, EntityPlayer player){
-        List<int[]> list = new ArrayList<int[]>();
-        getAccessoryTiles(list, world, x, y, z);
-        int tileCount = list.size();
+    public boolean isGameDoneAndReward(World world, BlockPos pos, EntityPlayer player){
+        Set<BlockPos> positions = new HashSet<BlockPos>();
+        getAccessoryTiles(positions, world,pos);
+        int tileCount = positions.size();
         int bombCount = 0;
         int hardcoreBombCount = 0;
 
-        for(int[] coord : list) {
-            int neighMeta = world.getBlockMetadata(coord[0], coord[1], coord[2]);
-            if(MinesweeperUtils.isTileClosed(neighMeta) && !MinesweeperUtils.isTileBomb(neighMeta) && world.getBlock(coord[0], coord[1], coord[2]) == this) {
+        for(BlockPos coord : positions) {
+            EnumState state = getState(world.getBlockState(coord));
+            if(!state.opened && !state.bomb) {
                 return false;
             }
-            if(MinesweeperUtils.isTileBomb(neighMeta)) bombCount++;
-            if(MinesweeperUtils.isTileHardcoreBomb(neighMeta)) hardcoreBombCount++;
+            if(state.bomb) bombCount++;
+            if(state.hardcoreBomb) hardcoreBombCount++;
         }
 
         if(tileCount > 50) player.triggerAchievement(MinesweeperUtils.getAchieveFromName("achieveCleared1"));
@@ -219,8 +297,8 @@ public class BlockMinesweeper extends Block{
 	        double var7 = world.rand.nextFloat() * var6 + (1.0F - var6) * 0.5D;
 	        double var9 = world.rand.nextFloat() * var6 + (1.0F - var6) * 0.5D;
 	        double var11 = world.rand.nextFloat() * var6 + (1.0F - var6) * 0.5D;
-	        EntityItem var13 = new EntityItem(world, x + var7, y + 1D + var9, z + var11, iStack[i]);
-	        var13.delayBeforeCanPickup = 10;
+	        EntityItem var13 = new EntityItem(world, pos.getX() + var7, pos.getY() + 1D + var9, pos.getZ() + var11, iStack[i]);
+	        var13.setDefaultPickupDelay();
 	        world.spawnEntityInWorld(var13);
         }
         return true;
@@ -271,20 +349,19 @@ public class BlockMinesweeper extends Block{
         return reward.getReward();
     }
 
-    public void eraseField(World world, int x, int y, int z, boolean explodeOnHardcore){
-        List<int[]> list = new ArrayList<int[]>();
+    public void eraseField(World world, BlockPos pos, boolean explodeOnHardcore){
+        Set<BlockPos> positions = new HashSet<BlockPos>();
         Random rand = new Random();
-        getAccessoryTiles(list, world, x, y, z);
-        for(int i = 0; i < list.size(); i++) {
-            int[] coord = list.get(i);
-            world.scheduleBlockUpdate(coord[0], coord[1], coord[2], this, rand.nextInt(100) + 5);
-            int neighMeta = world.getBlockMetadata(coord[0], coord[1], coord[2]);
-            if(MinesweeperUtils.isTileBomb(neighMeta) && (!MinesweeperUtils.isTileHardcoreBomb(neighMeta) || !explodeOnHardcore)) {
-                setBlockMetadata(world, coord[0], coord[1], coord[2], 11);// show that this tile was a bomb.
+        getAccessoryTiles(positions, world, pos);
+        for(BlockPos p : positions) {
+            world.scheduleUpdate(p, this, rand.nextInt(100) + 5);
+            EnumState state = getState(world.getBlockState(p));
+            if(state.bomb && (!state.hardcoreBomb || !explodeOnHardcore)) {
+                world.setBlockState(p, world.getBlockState(p).withProperty(STATE, EnumState.OPENED_BOMB));// show that this tile was a bomb.
                 if(!explodeOnHardcore) {
                     for(int k = 0; k < 1; k++) {
                         //When the player cleared, the field, give XP for each bomb cleared.
-                        EntityXPOrb xpOrb = new EntityXPOrb(world, (double)coord[0] + 0.5F, (double)coord[1] + 1.0F, (double)coord[2] + 0.5F, 2);
+                        EntityXPOrb xpOrb = new EntityXPOrb(world, (double)pos.getX() + 0.5F, (double)pos.getY()+ 1.0F, (double)pos.getZ() + 0.5F, 2);
                         xpOrb.motionX = rand.nextDouble() - 0.5D;
                         xpOrb.motionY = rand.nextDouble() - 0.5D;
                         xpOrb.motionZ = rand.nextDouble() - 0.5D;
@@ -296,55 +373,44 @@ public class BlockMinesweeper extends Block{
     }
 
     /**
-     * All Minesweeper blocks connecting this Minesweeper blocks will be added to the given arraylist of coordinates. This method
+     * All Minesweeper blocks connecting this Minesweeper blocks will be added to the given set of coordinates. This method
      * will be recursively called until the whole minefield is on the list.
-     * @param list
      * @param world
      * @param x
      * @param y
      * @param z
      */
-    public void getAccessoryTiles(List<int[]> list, World world, int x, int y, int z){
+    public void getAccessoryTiles(Set<BlockPos> positions, World world, BlockPos startPos){
+    	int x = startPos.getX();
+    	int y = startPos.getY();
+    	int z = startPos.getZ();
         for(int i = x - 1; i <= x + 1; i++) {
             for(int j = z - 1; j <= z + 1; j++) {
-                if(world.getBlock(i, y, j) == this && !listContainsCoord(list, i, y, j)) {
-                    int[] coord = {i, y, j};
-                    list.add(coord);
-                    getAccessoryTiles(list, world, i, y, j);
+            	BlockPos pos = new BlockPos(i,y,j);
+                if(world.getBlockState(pos).getBlock() == this && positions.add(pos)) {
+                    getAccessoryTiles(positions, world, pos);
                 }
             }
         }
     }
 
-    private boolean listContainsCoord(List<int[]> list, int x, int y, int z){
-        for(int i = 0; i < list.size(); i++) {
-            int[] coord = list.get(i);
-            if(coord[0] == x && coord[1] == y && coord[2] == z) return true;
-        }
-        return false;
-    }
-
     // when the minefield game is done the blocks have to disappear, and they're doing this with this method.
     @Override
-    public void updateTick(World world, int x, int y, int z, Random rand){
-        if(MinesweeperUtils.isTileHardcoreBomb(world.getBlockMetadata(x, y, z))) {
-            world.createExplosion(null, (double)x + 0.5F, (double)y + 1.5F, (double)z + 0.5F, EXPLOSION_RADIUS, true);
+    public void updateTick(World world, BlockPos pos, IBlockState state, Random rand){
+        if(getState(state).hardcoreBomb) {
+            world.createExplosion(null, (double)pos.getX() + 0.5F, (double)pos.getY() + 1.5F, (double)pos.getZ() + 0.5F, EXPLOSION_RADIUS, true);
         }
-        world.setBlock(x, y, z, Blocks.air);// make the block disappear
+        world.setBlockToAir(pos);
         for(int i = 0; i < 5; i++) {
-            double randX = x + rand.nextDouble();
-            double randY = y + rand.nextDouble();
-            double randZ = z + rand.nextDouble();
-            MinesweeperMod.packetPipeline.sendToAllAround(new PacketSpawnParticle("explode", randX, randY, randZ, 0, 0, 0), world);
+            double randX = pos.getX() + rand.nextDouble();
+            double randY = pos.getY() + rand.nextDouble();
+            double randZ = pos.getZ() + rand.nextDouble();
+            NetworkHandler.sendToAllAround(new PacketSpawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, randX, randY, randZ, 0, 0, 0), world);
         }
     }
 
     @Override
     public int quantityDropped(Random rand){
         return 0;
-    }
-
-    public void setBlockMetadata(World world, int x, int y, int z, int metadata){
-        world.setBlock(x, y, z, this, metadata, 3);
     }
 }

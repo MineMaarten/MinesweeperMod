@@ -3,8 +3,10 @@ package minesweeperMod.common;
 import java.util.List;
 
 import minesweeperMod.client.MinesweeperDrawBlockHighlightHandler;
+import minesweeperMod.common.BlockMinesweeper.EnumState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.world.World;
 
@@ -66,7 +68,7 @@ public class TutorialHandler{
                 }
                 break;
             case 2:
-                if(!MinesweeperUtils.isTileClosed(world.getBlockMetadata(baseX + 2, baseY, baseZ + 3))) {
+                if(getState(baseX + 2, baseY, baseZ + 3).opened) {
                     stopRenderingTile(baseX + 2, baseY, baseZ + 3);
                     stopRenderingTile(baseX + 2, baseY, baseZ + 4);
                     sendChatToNearbyPlayers("advancedTutorial.dialog3");
@@ -108,7 +110,7 @@ public class TutorialHandler{
                 }
                 break;
             case 6:
-                if(!MinesweeperUtils.isTileClosed(world.getBlockMetadata(baseX + 4, baseY, baseZ + 2))) {
+                if(getState(baseX + 4, baseY, baseZ + 2).opened) {
                     stopRenderingTile(baseX + 3, baseY, baseZ + 0);
                     stopRenderingTile(baseX + 4, baseY, baseZ + 0);
                     stopRenderingTile(baseX + 4, baseY, baseZ + 1);
@@ -120,7 +122,7 @@ public class TutorialHandler{
                 }
                 break;
             case 7:
-                if(MinesweeperUtils.isTileFlagged(world.getBlockMetadata(baseX, baseY, baseZ + 2))) {
+                if(getState(baseX, baseY, baseZ + 2).flagged) {
                     stopRenderingTile(baseX + 0, baseY, baseZ + 2);
                     sendChatToNearbyPlayers("advancedTutorial.dialog8");
                     step++;
@@ -136,7 +138,7 @@ public class TutorialHandler{
                 }
                 break;
             case 9:
-                if(!MinesweeperUtils.isTileClosed(world.getBlockMetadata(baseX, baseY, baseZ + 1)) && !MinesweeperUtils.isTileClosed(world.getBlockMetadata(baseX, baseY, baseZ + 3))) {
+                if(getState(baseX, baseY, baseZ + 1).opened && getState(baseX, baseY, baseZ + 3).opened) {
                     stopRenderingTile(baseX + 1, baseY, baseZ + 2);
 
                     sendChatToNearbyPlayers("advancedTutorial.dialog10");
@@ -178,7 +180,7 @@ public class TutorialHandler{
                 }
                 break;
             case 13:
-                if(!MinesweeperUtils.isTileClosed(world.getBlockMetadata(baseX + 5, baseY, baseZ + 1)) && !MinesweeperUtils.isTileClosed(world.getBlockMetadata(baseX + 5, baseY, baseZ + 2)) && !MinesweeperUtils.isTileClosed(world.getBlockMetadata(baseX + 5, baseY, baseZ + 3))) {
+                if(getState(baseX + 5, baseY, baseZ + 1).opened && getState(baseX + 5, baseY, baseZ + 2).opened && getState(baseX + 5, baseY, baseZ + 3).opened) {
                     stopRenderingTile(baseX + 4, baseY, baseZ + 2);
 
                     stopRenderingTile(baseX + 4, baseY, baseZ + 1);
@@ -198,6 +200,10 @@ public class TutorialHandler{
                 return false;
         }
         return true;
+    }
+    
+    private EnumState getState(int x, int y, int z){
+    	return BlockMinesweeper.getState(world.getBlockState(new BlockPos(x,y,z)));
     }
 
     private boolean handleLevel1(){
@@ -221,7 +227,7 @@ public class TutorialHandler{
                 step++;
                 break;
             case 3:
-                if(!MinesweeperUtils.isTileClosed(world.getBlockMetadata(baseX + 3, baseY, baseZ + 3))) {
+                if(getState(baseX + 3, baseY, baseZ + 3).opened) {
                     for(int i = baseX + 2; i <= baseX + 4; i++) {
                         for(int j = baseZ + 2; j <= baseZ + 4; j++) {
                             stopRenderingTile(i, baseY, j);
@@ -263,7 +269,7 @@ public class TutorialHandler{
                 step++;
                 break;
             case 8:
-                if(MinesweeperUtils.isTileFlagged(world.getBlockMetadata(baseX, baseY, baseZ + 5))) {
+                if(getState(baseX, baseY, baseZ + 5).flagged) {
                     for(int i = baseX; i <= baseX + 2; i++) {
                         for(int j = baseZ + 3; j <= baseZ + 5; j++) {
                             stopRenderingTile(i, baseY, j);
@@ -277,7 +283,7 @@ public class TutorialHandler{
                 }
                 break;
             case 9:
-                if(!MinesweeperUtils.isTileClosed(world.getBlockMetadata(baseX, baseY, baseZ + 6))) {
+                if(getState(baseX, baseY, baseZ + 6).opened) {
                     stopRenderingTile(baseX, baseY, baseZ + 6);
                     stopRenderingTile(baseX + 1, baseY, baseZ + 6);
                     sendChatToNearbyPlayers("tutorial.dialog7");
@@ -315,11 +321,11 @@ public class TutorialHandler{
     private boolean checkForDone(){
         for(int i = 0; i < 6; i++) {
             for(int j = 0; j < 6; j++) {
-                if(world.getBlock(baseX + i, baseY, baseZ + j) != MinesweeperMod.blockMinesweeper) {
+                if(world.getBlockState(new BlockPos(baseX + i, baseY, baseZ + j)).getBlock() != MinesweeperMod.blockMinesweeper) {
                     sendChatToNearbyPlayers("tutorialFail");
                     stopTutorial();
                     return true;
-                } else if(MinesweeperUtils.isTileClosed(world.getBlockMetadata(baseX + i, baseY, baseZ + j))) {
+                } else if(!getState(baseX + i, baseY, baseZ + j).opened) {
                     return false; // when there is at least one tile closed, we
                                   // are not done.
                 }
@@ -356,7 +362,7 @@ public class TutorialHandler{
     }
 
     private void sendChatToNearbyPlayers(String chatMessage){
-        AxisAlignedBB bbBox = AxisAlignedBB.getBoundingBox(baseX - 5, baseY - 5, baseZ - 5, baseX + 13, baseY + 8, baseZ + 13);
+        AxisAlignedBB bbBox = new AxisAlignedBB(baseX - 5, baseY - 5, baseZ - 5, baseX + 13, baseY + 8, baseZ + 13);
         List<EntityPlayer> players = world.getEntitiesWithinAABB(EntityPlayer.class, bbBox);
         for(int i = 0; i < players.size(); i++) {
             players.get(i).addChatComponentMessage(new ChatComponentTranslation(chatMessage, new Object[0]));
@@ -364,7 +370,7 @@ public class TutorialHandler{
     }
 
     private void addAchievementToNearbyPlayers(String achievementName){
-        AxisAlignedBB bbBox = AxisAlignedBB.getBoundingBox(baseX - 5, baseY - 5, baseZ - 5, baseX + 13, baseY + 8, baseZ + 13);
+        AxisAlignedBB bbBox = new AxisAlignedBB(baseX - 5, baseY - 5, baseZ - 5, baseX + 13, baseY + 8, baseZ + 13);
         List<EntityPlayer> players = world.getEntitiesWithinAABB(EntityPlayer.class, bbBox);
         for(int i = 0; i < players.size(); i++) {
             players.get(i).triggerAchievement(MinesweeperUtils.getAchieveFromName(achievementName));
