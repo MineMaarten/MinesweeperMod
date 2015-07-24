@@ -124,17 +124,17 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
         fillWithMetadataBlocks(world, baseX, baseY + 1, middleZ - oddZ, baseX, baseY + 4, middleZ + 1, Blocks.air);// -X doorway
         fillWithMetadataBlocks(world, maxX, baseY + 1, middleZ - oddZ, maxX, baseY + 4, middleZ + 1, Blocks.air);// +X doorway
 
-        setTorch(world,middleX - 1 - oddX, baseY + 3, baseZ + 1, EnumFacing.SOUTH);
-        setTorch(world,middleX + 2, baseY + 3, baseZ + 1, EnumFacing.SOUTH);
+        setTorch(world, middleX - 1 - oddX, baseY + 3, baseZ + 1, EnumFacing.SOUTH);
+        setTorch(world, middleX + 2, baseY + 3, baseZ + 1, EnumFacing.SOUTH);
 
-        setTorch(world,middleX - 1 - oddX, baseY + 3, maxZ - 1, EnumFacing.NORTH);
-        setTorch(world,middleX + 2, baseY + 3, maxZ - 1, EnumFacing.NORTH);
+        setTorch(world, middleX - 1 - oddX, baseY + 3, maxZ - 1, EnumFacing.NORTH);
+        setTorch(world, middleX + 2, baseY + 3, maxZ - 1, EnumFacing.NORTH);
 
-        setTorch(world,baseX + 1, baseY + 3, middleZ - 1 - oddZ, EnumFacing.EAST);
-        setTorch(world,baseX + 1, baseY + 3, middleZ + 2, EnumFacing.EAST);
+        setTorch(world, baseX + 1, baseY + 3, middleZ - 1 - oddZ, EnumFacing.EAST);
+        setTorch(world, baseX + 1, baseY + 3, middleZ + 2, EnumFacing.EAST);
 
-        setTorch(world,maxX - 1, baseY + 3, middleZ - 1 - oddZ, EnumFacing.WEST);
-        setTorch(world,maxX - 1, baseY + 3, middleZ + 2, EnumFacing.WEST);
+        setTorch(world, maxX - 1, baseY + 3, middleZ - 1 - oddZ, EnumFacing.WEST);
+        setTorch(world, maxX - 1, baseY + 3, middleZ + 2, EnumFacing.WEST);
 
         /*
          * torch metadata's: 1: X+ 2: X- 3: Z+ 4: Z-
@@ -169,9 +169,9 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
             }
         }
     }
-    
+
     private void setTorch(World world, int x, int y, int z, EnumFacing facing){
-    	world.setBlockState(new BlockPos(x,y,z), Blocks.torch.getDefaultState().withProperty(BlockTorch.FACING, facing));
+        world.setBlockState(new BlockPos(x, y, z), Blocks.torch.getDefaultState().withProperty(BlockTorch.FACING, facing));
     }
 
     public void generateCorridor(World world, Random rand, int direction, int minefieldX, int minefieldZ, int minX, int minZ, int maxX, int maxZ, int Y, int difficulty){
@@ -209,10 +209,10 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
             }
             fillWithMetadataBlocks(world, maxX + 1, Y + 1, minZ + 1, maxX + 1, Y + CORRIDOR_HEIGHT - 1, maxZ - 1, Blocks.air); // first remove all the torches
             fillWithMetadataBlocks(world, minX - 1, Y + 1, minZ + 1, maxX, Y + CORRIDOR_HEIGHT - 1, maxZ - 1, Blocks.air);
-            setTorch(world,minX - 1, Y + 3, minZ, EnumFacing.WEST);
-            setTorch(world,minX - 1, Y + 3, maxZ, EnumFacing.WEST);
-            setTorch(world,maxX + 1, Y + 3, minZ, EnumFacing.EAST);
-            setTorch(world,maxX + 1, Y + 3, maxZ, EnumFacing.EAST);
+            setTorch(world, minX - 1, Y + 3, minZ, EnumFacing.WEST);
+            setTorch(world, minX - 1, Y + 3, maxZ, EnumFacing.WEST);
+            setTorch(world, maxX + 1, Y + 3, minZ, EnumFacing.EAST);
+            setTorch(world, maxX + 1, Y + 3, maxZ, EnumFacing.EAST);
         } else { // 'moving' on the Z-axis
             fillWithMetadataBlocks(world, minX, Y, minZ, minX, Y + CORRIDOR_HEIGHT, maxZ, getDifficultyBlock(difficulty));
             fillWithMetadataBlocks(world, maxX, Y, minZ, maxX, Y + CORRIDOR_HEIGHT, maxZ, getDifficultyBlock(difficulty));
@@ -222,10 +222,10 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
             }
             fillWithMetadataBlocks(world, minX + 1, Y + 1, maxZ + 1, maxX - 1, Y + CORRIDOR_HEIGHT - 1, maxZ + 1, Blocks.air); // first remove the torches
             fillWithMetadataBlocks(world, minX + 1, Y + 1, minZ - 1, maxX - 1, Y + CORRIDOR_HEIGHT - 1, maxZ, Blocks.air);
-            setTorch(world,minX, Y + 3, maxZ + 1, EnumFacing.SOUTH);
-            setTorch(world,maxX, Y + 3, maxZ + 1,   EnumFacing.SOUTH);
-            setTorch(world,minX, Y + 3, minZ - 1,  EnumFacing.NORTH);
-            setTorch(world,maxX, Y + 3, minZ - 1,  EnumFacing.NORTH);
+            setTorch(world, minX, Y + 3, maxZ + 1, EnumFacing.SOUTH);
+            setTorch(world, maxX, Y + 3, maxZ + 1, EnumFacing.SOUTH);
+            setTorch(world, minX, Y + 3, minZ - 1, EnumFacing.NORTH);
+            setTorch(world, maxX, Y + 3, minZ - 1, EnumFacing.NORTH);
         }
     }
 
@@ -257,14 +257,14 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
     }
 
     private void fillWithMetadataBlocks(World world, int minX, int minY, int minZ, int maxX, int maxY, int maxZ, Block block){
-    	fillWithMetadataBlocks(world,minX,minY,minZ,maxX,maxY,maxZ,block.getDefaultState());
+        fillWithMetadataBlocks(world, minX, minY, minZ, maxX, maxY, maxZ, block.getDefaultState());
     }
-    	
-    	 private void fillWithMetadataBlocks(World world, int minX, int minY, int minZ, int maxX, int maxY, int maxZ, IBlockState state){
-    		   for(int i = minX; i <= maxX; i++) {
+
+    private void fillWithMetadataBlocks(World world, int minX, int minY, int minZ, int maxX, int maxY, int maxZ, IBlockState state){
+        for(int i = minX; i <= maxX; i++) {
             for(int j = minY; j <= maxY; j++) {
                 for(int k = minZ; k <= maxZ; k++) {
-                    world.setBlockState(new BlockPos(i,j,k), state);
+                    world.setBlockState(new BlockPos(i, j, k), state);
                 }
             }
         }
@@ -289,12 +289,12 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
                 Random rand = new Random();
                 EnumState state;
                 if(rand.nextInt(tileBombRatio) == 0) {
-                	state = difficulty == 3 ? EnumState.CLOSED_BOMB_HARDCORE : EnumState.CLOSED_BOMB; // generate hardcore bombs instead of normal bombs
+                    state = difficulty == 3 ? EnumState.CLOSED_BOMB_HARDCORE : EnumState.CLOSED_BOMB; // generate hardcore bombs instead of normal bombs
                 } else {
-                	state = EnumState.CLOSED;
+                    state = EnumState.CLOSED;
                 }
                 world.setBlockState(new BlockPos(i, Y, j), MinesweeperMod.blockMinesweeper.getDefaultState().withProperty(BlockMinesweeper.STATE, state));
-                
+
             }
         }
     }
@@ -307,7 +307,7 @@ public class WorldGeneratorMinesweeper implements IWorldGenerator{
             currentLevel = 0; // reset the counter
             for(int i = minX; i <= maxX; i++) {
                 for(int j = minZ; j <= maxZ; j++) {
-                	BlockPos pos = new BlockPos(i, Y, j);
+                    BlockPos pos = new BlockPos(i, Y, j);
                     if(!world.isAirBlock(pos) && !world.getBlockState(pos).getBlock().isReplaceable(world, pos)) currentLevel++;
                     if(world.getBlockState(pos).getBlock() == Blocks.water) return 0;
                 }

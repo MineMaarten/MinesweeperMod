@@ -10,7 +10,6 @@ import minesweeperMod.client.FieldStatHandler;
 import minesweeperMod.common.network.NetworkHandler;
 import minesweeperMod.common.network.PacketSpawnParticle;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockStoneBrick;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockState;
@@ -37,106 +36,75 @@ import net.minecraftforge.common.config.Property;
 
 public class BlockMinesweeper extends Block{
     public static final float EXPLOSION_RADIUS = 4.0F;
-    public static final PropertyEnum STATE = PropertyEnum.create("state",EnumState.class);
-    
-    public enum EnumState implements IStringSerializable{   	
-    	B0, B1, B2, B3,B4,B5,B6,B7,B8,CLOSED(false, false, false),CLOSED_FLAGGED(false, true, false), OPENED_BOMB(true, false, true),CLOSED_BOMB_HARDCORE(false, false, true, true),CLOSED_BOMB_HARDCORE_FLAGGED(false, true,true,true),CLOSED_BOMB(false, false, true),CLOSED_BOMB_FLAGGED(false, true, true);
-    	
-    	public boolean opened = true;
-    	public boolean flagged;
-    	public boolean bomb;
-    	public boolean hardcoreBomb;
-    	
-    	private EnumState(){
-    		
-    	}
-    	
-    	private EnumState(boolean opened, boolean flagged, boolean bomb){
-    		this.opened = opened;
-    		this.flagged = flagged;
-    		this.bomb = bomb;
-    	}
-    	
-    	private EnumState(boolean opened, boolean flagged, boolean bomb, boolean hardcoreBomb){
-    		this(opened, flagged, bomb);
-    		this.hardcoreBomb = hardcoreBomb;
-    	}
-    	
-    	public EnumState toggleFlag(){
-    		for(EnumState otherState : values()){
-    			if(!otherState.opened && otherState.bomb == bomb && otherState.hardcoreBomb == hardcoreBomb && otherState.flagged != flagged){
-    				return otherState;
-    			}
-    		}
-    		throw new IllegalStateException("Can't switch flags for an opened tile");
-    	}
+    public static final PropertyEnum STATE = PropertyEnum.create("state", EnumState.class);
 
-		@Override
-		public String getName() {
-			return name();
-		}
+    public enum EnumState implements IStringSerializable{
+        B0, B1, B2, B3, B4, B5, B6, B7, B8, CLOSED(false, false, false), CLOSED_FLAGGED(false, true, false), OPENED_BOMB(
+                true, false, true), CLOSED_BOMB_HARDCORE(false, false, true, true), CLOSED_BOMB_HARDCORE_FLAGGED(false,
+                true, true, true), CLOSED_BOMB(false, false, true), CLOSED_BOMB_FLAGGED(false, true, true);
+
+        public boolean opened = true;
+        public boolean flagged;
+        public boolean bomb;
+        public boolean hardcoreBomb;
+
+        private EnumState(){
+
+        }
+
+        private EnumState(boolean opened, boolean flagged, boolean bomb){
+            this.opened = opened;
+            this.flagged = flagged;
+            this.bomb = bomb;
+        }
+
+        private EnumState(boolean opened, boolean flagged, boolean bomb, boolean hardcoreBomb){
+            this(opened, flagged, bomb);
+            this.hardcoreBomb = hardcoreBomb;
+        }
+
+        public EnumState toggleFlag(){
+            for(EnumState otherState : values()) {
+                if(!otherState.opened && otherState.bomb == bomb && otherState.hardcoreBomb == hardcoreBomb && otherState.flagged != flagged) {
+                    return otherState;
+                }
+            }
+            throw new IllegalStateException("Can't switch flags for an opened tile");
+        }
+
+        @Override
+        public String getName(){
+            return name();
+        }
     }
-  //  private IIcon[] texture;
 
     public BlockMinesweeper(Material par3Material){
         super(par3Material);
     }
-    
-    protected BlockState createBlockState()
-    {
+
+    @Override
+    protected BlockState createBlockState(){
         return new BlockState(this, STATE);
     }
-    
+
     /**
      * Convert the given metadata into a BlockState for this Block
      */
-    public IBlockState getStateFromMeta(int meta)
-    {
-        return this.getDefaultState().withProperty(STATE, EnumState.values()[meta]);
+    @Override
+    public IBlockState getStateFromMeta(int meta){
+        return getDefaultState().withProperty(STATE, EnumState.values()[meta]);
     }
 
     /**
      * Convert the BlockState into the correct metadata value
      */
-    public int getMetaFromState(IBlockState state)
-    {
+    @Override
+    public int getMetaFromState(IBlockState state){
         return ((EnumState)state.getValue(STATE)).ordinal();
     }
-    
 
-   /* @Override
-    @SideOnly(Side.CLIENT)
-    public void registerBlockIcons(IIconRegister par1IconRegister){
-        texture = new IIcon[12];
-        for(int i = 0; i < 12; i++) {
-            texture[i] = par1IconRegister.registerIcon("minesweeperMod:BlockMinesweeper" + i);
-        }
-    }
-
-    @Override
-    public IIcon getIcon(int side, int meta){
-        switch(meta){
-            case 12:
-            case 14:
-                return texture[9]; // closed tile texture
-            case 13:
-            case 15:
-                return texture[10]; // flagged tile texture
-            default:
-                return texture[meta];
-        }
-        /*
-         * meta mapping: 0-8 -->opened tiles, without bomb, displaying the
-         * neighbour bomb count 9 -->closed tile, without bomb, not flagged. 10
-         * -->closed tile, without bomb, flagged. 11 -->opened tile, with bomb,
-         * non-red 12 -->closed tile, with hardcore bomb, not flagged. 13
-         * -->closed tile, with hardcore bomb, flagged. 14 -->closed tile, with
-         * bomb, not flagged 15 -->closed tile, with bomb, flagged.
-         *
-    }*/
-    
     public static EnumState getState(IBlockState state){
-    	return (EnumState)state.getValue(STATE);
+        return (EnumState)state.getValue(STATE);
     }
 
     @Override
@@ -145,7 +113,7 @@ public class BlockMinesweeper extends Block{
             FieldStatHandler.pos = pos;
             FieldStatHandler.forceUpdate = true;
         } else {
-        	EnumState s = getState(state);
+            EnumState s = getState(state);
             if(!s.opened && (player.getCurrentEquippedItem() == null || player.getCurrentEquippedItem().getItem() != MinesweeperMod.itemMineDetector)) {
                 world.setBlockState(pos, state.withProperty(STATE, s.toggleFlag()));
                 if(!s.flagged) {//if we just flagged a tile
@@ -167,7 +135,7 @@ public class BlockMinesweeper extends Block{
         } else {
             EnumState state = getState(world.getBlockState(pos));
             if(!state.opened) {
-                openTile(world, pos,state, player);
+                openTile(world, pos, state, player);
             } else {
                 if(getSurroundingFlags(world, pos) == state.ordinal()) {// when the amount of flags is the same as the number of bombs around the clicked block, we should be able to open every other tile surrounding this one.
                     openSurroundingNonFlags(world, pos, player);
@@ -198,13 +166,13 @@ public class BlockMinesweeper extends Block{
     }
 
     private int getSurroundingBombs(World world, BlockPos pos){
-    	int x = pos.getX();
-    	int y = pos.getY();
-    	int z = pos.getZ();
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
         int bombCount = 0;
         for(int i = x - 1; i <= x + 1; i++) {
             for(int j = z - 1; j <= z + 1; j++) {
-            	IBlockState state = world.getBlockState(new BlockPos(i, y,j));
+                IBlockState state = world.getBlockState(new BlockPos(i, y, j));
                 if(state.getBlock() == this && getState(state).bomb) {
                     bombCount++;
                 }
@@ -214,13 +182,13 @@ public class BlockMinesweeper extends Block{
     }
 
     private int getSurroundingFlags(World world, BlockPos pos){
-    	int x = pos.getX();
-    	int y = pos.getY();
-    	int z = pos.getZ();
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
         int flagCount = 0;
         for(int i = x - 1; i <= x + 1; i++) {
             for(int j = z - 1; j <= z + 1; j++) {
-            	IBlockState state = world.getBlockState(new BlockPos(i, y,j));
+                IBlockState state = world.getBlockState(new BlockPos(i, y, j));
                 if(state.getBlock() == this && getState(state).flagged) {
                     flagCount++;
                 }
@@ -230,13 +198,13 @@ public class BlockMinesweeper extends Block{
     }
 
     private void openSurroundingNonFlags(World world, BlockPos pos, EntityPlayer player){
-    	int x = pos.getX();
-    	int y = pos.getY();
-    	int z = pos.getZ();
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
         for(int i = x - 1; i <= x + 1; i++) {
             for(int j = z - 1; j <= z + 1; j++) {
-            	BlockPos localPos = new BlockPos(i, y,j);
-            	IBlockState state = world.getBlockState(localPos);
+                BlockPos localPos = new BlockPos(i, y, j);
+                IBlockState state = world.getBlockState(localPos);
                 if(state.getBlock() == this && !getState(state).flagged && !getState(state).opened) {
                     openTile(world, localPos, getState(state), player);
                 }
@@ -246,7 +214,7 @@ public class BlockMinesweeper extends Block{
 
     public boolean isGameDoneAndReward(World world, BlockPos pos, EntityPlayer player){
         Set<BlockPos> positions = new HashSet<BlockPos>();
-        getAccessoryTiles(positions, world,pos);
+        getAccessoryTiles(positions, world, pos);
         int tileCount = positions.size();
         int bombCount = 0;
         int hardcoreBombCount = 0;
@@ -288,62 +256,62 @@ public class BlockMinesweeper extends Block{
             iStack = getReward(Constants.LOOT_TABLE_EASY_CATEGORY, tileCount);
         }
 
-        if (iStack == null) {
+        if(iStack == null) {
             return true;
         }
-        
-        for (int i = 0; i < iStack.length; i++) {
-	        float var6 = 0.7F;
-	        double var7 = world.rand.nextFloat() * var6 + (1.0F - var6) * 0.5D;
-	        double var9 = world.rand.nextFloat() * var6 + (1.0F - var6) * 0.5D;
-	        double var11 = world.rand.nextFloat() * var6 + (1.0F - var6) * 0.5D;
-	        EntityItem var13 = new EntityItem(world, pos.getX() + var7, pos.getY() + 1D + var9, pos.getZ() + var11, iStack[i]);
-	        var13.setDefaultPickupDelay();
-	        world.spawnEntityInWorld(var13);
+
+        for(ItemStack element : iStack) {
+            float var6 = 0.7F;
+            double var7 = world.rand.nextFloat() * var6 + (1.0F - var6) * 0.5D;
+            double var9 = world.rand.nextFloat() * var6 + (1.0F - var6) * 0.5D;
+            double var11 = world.rand.nextFloat() * var6 + (1.0F - var6) * 0.5D;
+            EntityItem var13 = new EntityItem(world, pos.getX() + var7, pos.getY() + 1D + var9, pos.getZ() + var11, element);
+            var13.setDefaultPickupDelay();
+            world.spawnEntityInWorld(var13);
         }
         return true;
     }
 
-    private ItemStack[] getReward(String difficulty, int tileCount) {
+    private ItemStack[] getReward(String difficulty, int tileCount){
         Configuration config = new Configuration(MinesweeperMod.configFile);
         ConfigCategory category = config.getCategory(difficulty);
         TreeMap<Integer, Property> difficultyRewards = new TreeMap<Integer, Property>();
-        for (Entry<String, Property> entry : category.getValues().entrySet()) {
+        for(Entry<String, Property> entry : category.getValues().entrySet()) {
             difficultyRewards.put(Integer.parseInt(entry.getKey()), entry.getValue());
         }
 
         Entry<Integer, Property> rewardEntry = difficultyRewards.floorEntry(tileCount);
-        if (rewardEntry == null) {
+        if(rewardEntry == null) {
             return null;
         }
 
         String[] rewardConfig = rewardEntry.getValue().getStringList();
-        if (rewardConfig.length == 0) {
-        	return null;
+        if(rewardConfig.length == 0) {
+            return null;
         }
         Reward[] rewards = new Reward[rewardConfig.length];
-        for (int i = 0; i < rewardConfig.length; i++) {
+        for(int i = 0; i < rewardConfig.length; i++) {
             rewards[i] = new Reward(rewardConfig[i]);
         }
-        
+
         int totalWeight = 0;
-        for (Reward reward : rewards) {
+        for(Reward reward : rewards) {
             totalWeight += reward.getWeight();
         }
-        
+
         int randomIndex = -1;
         double random = Math.random() * totalWeight;
-        for (int i = 0; i < rewards.length; i++) {
+        for(int i = 0; i < rewards.length; i++) {
             random -= rewards[i].getWeight();
-            if (random <= 0.0d) {
+            if(random <= 0.0d) {
                 randomIndex = i;
                 break;
             }
         }
-        if (randomIndex == -1) {
+        if(randomIndex == -1) {
             return null;
         }
-        
+
         Reward reward = rewards[randomIndex];
 
         return reward.getReward();
@@ -361,7 +329,7 @@ public class BlockMinesweeper extends Block{
                 if(!explodeOnHardcore) {
                     for(int k = 0; k < 1; k++) {
                         //When the player cleared, the field, give XP for each bomb cleared.
-                        EntityXPOrb xpOrb = new EntityXPOrb(world, (double)pos.getX() + 0.5F, (double)pos.getY()+ 1.0F, (double)pos.getZ() + 0.5F, 2);
+                        EntityXPOrb xpOrb = new EntityXPOrb(world, (double)pos.getX() + 0.5F, (double)pos.getY() + 1.0F, (double)pos.getZ() + 0.5F, 2);
                         xpOrb.motionX = rand.nextDouble() - 0.5D;
                         xpOrb.motionY = rand.nextDouble() - 0.5D;
                         xpOrb.motionZ = rand.nextDouble() - 0.5D;
@@ -381,12 +349,12 @@ public class BlockMinesweeper extends Block{
      * @param z
      */
     public void getAccessoryTiles(Set<BlockPos> positions, World world, BlockPos startPos){
-    	int x = startPos.getX();
-    	int y = startPos.getY();
-    	int z = startPos.getZ();
+        int x = startPos.getX();
+        int y = startPos.getY();
+        int z = startPos.getZ();
         for(int i = x - 1; i <= x + 1; i++) {
             for(int j = z - 1; j <= z + 1; j++) {
-            	BlockPos pos = new BlockPos(i,y,j);
+                BlockPos pos = new BlockPos(i, y, j);
                 if(world.getBlockState(pos).getBlock() == this && positions.add(pos)) {
                     getAccessoryTiles(positions, world, pos);
                 }

@@ -75,7 +75,7 @@ public class FieldStatHandler{
                         bombCount = 0;
                         int hardcoreBombCount = 0;
                         for(BlockPos tile : tiles) {
-                        	BlockMinesweeper.EnumState state = BlockMinesweeper.getState(world.getBlockState(tile));
+                            BlockMinesweeper.EnumState state = BlockMinesweeper.getState(world.getBlockState(tile));
                             if(state.bomb) bombCount++;
                             if(state.flagged) flagCount++;
                             if(state.hardcoreBomb) hardcoreBombCount++;

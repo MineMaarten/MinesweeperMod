@@ -23,27 +23,28 @@ public class ForgeEventHandler{
      */
     @SubscribeEvent
     public void onPlayerClick(PlayerInteractEvent event){
-    	EntityPlayer player = event.entityPlayer;
-    	if (player.capabilities.isCreativeMode) {
-    		if (isSword(player.getCurrentEquippedItem())) {
-    			if(event.action == Action.LEFT_CLICK_BLOCK){
-    			Block block = player.worldObj.getBlockState(event.pos).getBlock();
-	    		 if(block == MinesweeperMod.blockMinesweeper) {
-	        		block.onBlockClicked(player.worldObj, event.pos, player);
-	        		event.setCanceled(true);
-	        	}}
-    		}
+        EntityPlayer player = event.entityPlayer;
+        if(player.capabilities.isCreativeMode) {
+            if(isSword(player.getCurrentEquippedItem())) {
+                if(event.action == Action.LEFT_CLICK_BLOCK) {
+                    Block block = player.worldObj.getBlockState(event.pos).getBlock();
+                    if(block == MinesweeperMod.blockMinesweeper) {
+                        block.onBlockClicked(player.worldObj, event.pos, player);
+                        event.setCanceled(true);
+                    }
+                }
+            }
         }
     }
-    
-    private boolean isSword(ItemStack equipped) {
-    	if (equipped == null) {
-    		return false;
-    	}
-    	Item item = equipped.getItem();
-    	if (item == Items.diamond_sword || item == Items.golden_sword || item == Items.iron_sword || item == Items.stone_sword || item == Items.wooden_sword) {
-    		return true;
-    	}
-    	return false;
+
+    private boolean isSword(ItemStack equipped){
+        if(equipped == null) {
+            return false;
+        }
+        Item item = equipped.getItem();
+        if(item == Items.diamond_sword || item == Items.golden_sword || item == Items.iron_sword || item == Items.stone_sword || item == Items.wooden_sword) {
+            return true;
+        }
+        return false;
     }
 }

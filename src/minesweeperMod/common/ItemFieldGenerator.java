@@ -20,7 +20,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  */
 
 public class ItemFieldGenerator extends Item{
-  //  IIcon[] texture;
 
     public ItemFieldGenerator(){
         super();
@@ -36,23 +35,6 @@ public class ItemFieldGenerator extends Item{
         subItems.add(new ItemStack(this, 1, 100));
         subItems.add(new ItemStack(this, 1, 101));
     }
-
-   /* @Override
-    public IIcon getIconFromDamage(int par1){
-        if(par1 < 12) return texture[par1];
-        else if(par1 == 100 || par1 == 101) return texture[par1 - 88];
-
-        return texture[0];
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void registerIcons(IIconRegister par1IconRegister){
-        texture = new IIcon[14];
-        for(int i = 0; i < 14; i++) {
-            texture[i] = par1IconRegister.registerIcon("minesweeperMod:ItemFieldGenerator" + i);
-        }
-    }*/
 
     @Override
     public String getUnlocalizedName(ItemStack itemstack){

@@ -15,10 +15,6 @@ import net.minecraft.world.World;
  */
 
 public class ItemMineDetector extends Item{
-   /* @Override
-    public void registerIcons(IIconRegister par1IconRegister){
-        itemIcon = par1IconRegister.registerIcon("minesweeperMod:ItemMineDetector");
-    }*/
 
     @Override
     public boolean onItemUse(ItemStack IStack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float par8, float par9, float par10){
@@ -27,7 +23,7 @@ public class ItemMineDetector extends Item{
                 player.addStat(MinesweeperUtils.getAchieveFromName("achieveUseDetector"), 1);
             }
             if(BlockMinesweeper.getState(world.getBlockState(pos)).bomb) {
-                world.playSoundEffect(pos.getX(),pos.getY(),pos.getZ(), "minesweepermod:minebeep", 1.0F, 1.0F);
+                world.playSoundEffect(pos.getX(), pos.getY(), pos.getZ(), "minesweepermod:minebeep", 1.0F, 1.0F);
             }
             IStack.stackSize--;
             return true;

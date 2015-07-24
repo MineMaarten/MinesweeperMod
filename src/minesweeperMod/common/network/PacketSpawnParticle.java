@@ -21,7 +21,7 @@ public class PacketSpawnParticle extends LocationDoublePacket<PacketSpawnParticl
 
     public PacketSpawnParticle(EnumParticleTypes particle, double x, double y, double z, double dx, double dy, double dz){
         super(x, y, z);
-        this.particleId= particle.ordinal();
+        this.particleId = particle.ordinal();
         this.dx = dx;
         this.dy = dy;
         this.dz = dz;
@@ -39,7 +39,7 @@ public class PacketSpawnParticle extends LocationDoublePacket<PacketSpawnParticl
     @Override
     public void fromBytes(ByteBuf buffer){
         super.fromBytes(buffer);
-       particleId = buffer.readInt();
+        particleId = buffer.readInt();
         dx = buffer.readDouble();
         dy = buffer.readDouble();
         dz = buffer.readDouble();

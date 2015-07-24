@@ -39,21 +39,21 @@ public class EntityFlag extends Entity{
                 double randX = posX + (rand.nextDouble() - 0.5D) / 2D;
                 double randY = posY + rand.nextDouble() * 2D;
                 double randZ = posZ + (rand.nextDouble() - 0.5D) / 2D;
-               NetworkHandler.sendToAllAround(new PacketSpawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, randX, randY, randZ, 0, 0, 0), worldObj);
+                NetworkHandler.sendToAllAround(new PacketSpawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, randX, randY, randZ, 0, 0, 0), worldObj);
             }
         }
     }
 
     @Override
     public void onUpdate(){
-    	
-    	if(!worldObj.isRemote){
-    	IBlockState blockState = worldObj.getBlockState(flaggedPos);
-        if((blockState.getBlock() != MinesweeperMod.blockMinesweeper || !BlockMinesweeper.getState(blockState).flagged)) {
-            setDead();
-            spawnSmoke();
+
+        if(!worldObj.isRemote) {
+            IBlockState blockState = worldObj.getBlockState(flaggedPos);
+            if((blockState.getBlock() != MinesweeperMod.blockMinesweeper || !BlockMinesweeper.getState(blockState).flagged)) {
+                setDead();
+                spawnSmoke();
+            }
         }
-    	}
         oldFlagRotation = flagRotation;
         if(worldObj.isRemote) {
             double maxSpeed = 1;
@@ -74,15 +74,15 @@ public class EntityFlag extends Entity{
 
     @Override
     protected void readEntityFromNBT(NBTTagCompound tag){
-    	flaggedPos = new BlockPos(tag.getInteger("flaggedX"),tag.getInteger("flaggedY"),tag.getInteger("flaggedZ"));
+        flaggedPos = new BlockPos(tag.getInteger("flaggedX"), tag.getInteger("flaggedY"), tag.getInteger("flaggedZ"));
     }
 
     @Override
     protected void writeEntityToNBT(NBTTagCompound tag){
-    	if(flaggedPos != null){
-	        tag.setInteger("flaggedX", flaggedPos.getX());
-	        tag.setInteger("flaggedY", flaggedPos.getY());
-	        tag.setInteger("flaggedZ", flaggedPos.getZ());
+        if(flaggedPos != null) {
+            tag.setInteger("flaggedX", flaggedPos.getX());
+            tag.setInteger("flaggedY", flaggedPos.getY());
+            tag.setInteger("flaggedZ", flaggedPos.getZ());
         }
     }
 

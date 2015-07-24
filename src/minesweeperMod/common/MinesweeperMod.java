@@ -72,12 +72,12 @@ public class MinesweeperMod{
 
     public static boolean configEnableGeneratorRecipes;
     public static boolean configEnableDetectorRecipe;
-    
+
     public static File configFile;
-   
+
     @EventHandler
     public void preInit(FMLPreInitializationEvent event){
-    	configFile = event.getSuggestedConfigurationFile();
+        configFile = event.getSuggestedConfigurationFile();
         Configuration config = new Configuration(configFile);
         config.load();
 
@@ -139,49 +139,49 @@ public class MinesweeperMod{
         sb.append("1;minecraft:iron_block:0:1:3;minecraft:iron_ingot:0:2:8\n\n");
         sb.append("If you do not what reward items for a particular difficulty, do not declare any reward tiers for that difficulty.");
         String lootTableConfigComment = sb.toString();
-        
+
         // Loot tables
-        if (!config.hasCategory(Constants.LOOT_TABLE_HARDCORE_CATEGORY)) {
-        	configLootTable(config, Constants.LOOT_TABLE_HARDCORE_CATEGORY, 51, Blocks.iron_block);
-        	configLootTable(config, Constants.LOOT_TABLE_HARDCORE_CATEGORY, 101, Blocks.gold_block);
-        	configLootTable(config, Constants.LOOT_TABLE_HARDCORE_CATEGORY, 201, Blocks.diamond_block);
-        	configLootTable(config, Constants.LOOT_TABLE_HARDCORE_CATEGORY, 301, Blocks.emerald_block);
-        	configLootTable(config, Constants.LOOT_TABLE_HARDCORE_CATEGORY, 501, Items.nether_star);
+        if(!config.hasCategory(Constants.LOOT_TABLE_HARDCORE_CATEGORY)) {
+            configLootTable(config, Constants.LOOT_TABLE_HARDCORE_CATEGORY, 51, Blocks.iron_block);
+            configLootTable(config, Constants.LOOT_TABLE_HARDCORE_CATEGORY, 101, Blocks.gold_block);
+            configLootTable(config, Constants.LOOT_TABLE_HARDCORE_CATEGORY, 201, Blocks.diamond_block);
+            configLootTable(config, Constants.LOOT_TABLE_HARDCORE_CATEGORY, 301, Blocks.emerald_block);
+            configLootTable(config, Constants.LOOT_TABLE_HARDCORE_CATEGORY, 501, Items.nether_star);
         }
         ConfigCategory configCategory = config.getCategory(Constants.LOOT_TABLE_HARDCORE_CATEGORY);
-    	configCategory.setComment(lootTableConfigComment);
-        if (!config.hasCategory(Constants.LOOT_TABLE_HARD_CATEGORY)) {
-        	configLootTable(config, Constants.LOOT_TABLE_HARD_CATEGORY, 51, Items.glowstone_dust, 3, 5);
-        	configLootTable(config, Constants.LOOT_TABLE_HARD_CATEGORY, 101, Blocks.glowstone, 3, 5);
-        	configLootTable(config, Constants.LOOT_TABLE_HARD_CATEGORY, 201, Items.diamond, 3, 5);
-        	configLootTable(config, Constants.LOOT_TABLE_HARD_CATEGORY, 301, Items.emerald, 3, 5);
-        	configLootTable(config, Constants.LOOT_TABLE_HARD_CATEGORY, 501, Items.skull, 1, 1, 1);
+        configCategory.setComment(lootTableConfigComment);
+        if(!config.hasCategory(Constants.LOOT_TABLE_HARD_CATEGORY)) {
+            configLootTable(config, Constants.LOOT_TABLE_HARD_CATEGORY, 51, Items.glowstone_dust, 3, 5);
+            configLootTable(config, Constants.LOOT_TABLE_HARD_CATEGORY, 101, Blocks.glowstone, 3, 5);
+            configLootTable(config, Constants.LOOT_TABLE_HARD_CATEGORY, 201, Items.diamond, 3, 5);
+            configLootTable(config, Constants.LOOT_TABLE_HARD_CATEGORY, 301, Items.emerald, 3, 5);
+            configLootTable(config, Constants.LOOT_TABLE_HARD_CATEGORY, 501, Items.skull, 1, 1, 1);
         }
         configCategory = config.getCategory(Constants.LOOT_TABLE_HARD_CATEGORY);
-    	configCategory.setComment(lootTableConfigComment);
-        if (!config.hasCategory(Constants.LOOT_TABLE_NORMAL_CATEGORY)) {
-        	configLootTable(config, Constants.LOOT_TABLE_NORMAL_CATEGORY, 51, Items.gold_ingot, 3, 5);
-        	configLootTable(config, Constants.LOOT_TABLE_NORMAL_CATEGORY, 101, Items.redstone, 3, 5);
-        	configLootTable(config, Constants.LOOT_TABLE_NORMAL_CATEGORY, 201, Items.glowstone_dust, 3, 5);
-        	configLootTable(config, Constants.LOOT_TABLE_NORMAL_CATEGORY, 301, Items.diamond, 3, 5);
-        	configLootTable(config, Constants.LOOT_TABLE_NORMAL_CATEGORY, 501, Items.emerald, 3, 5);
+        configCategory.setComment(lootTableConfigComment);
+        if(!config.hasCategory(Constants.LOOT_TABLE_NORMAL_CATEGORY)) {
+            configLootTable(config, Constants.LOOT_TABLE_NORMAL_CATEGORY, 51, Items.gold_ingot, 3, 5);
+            configLootTable(config, Constants.LOOT_TABLE_NORMAL_CATEGORY, 101, Items.redstone, 3, 5);
+            configLootTable(config, Constants.LOOT_TABLE_NORMAL_CATEGORY, 201, Items.glowstone_dust, 3, 5);
+            configLootTable(config, Constants.LOOT_TABLE_NORMAL_CATEGORY, 301, Items.diamond, 3, 5);
+            configLootTable(config, Constants.LOOT_TABLE_NORMAL_CATEGORY, 501, Items.emerald, 3, 5);
         }
         configCategory = config.getCategory(Constants.LOOT_TABLE_NORMAL_CATEGORY);
-    	configCategory.setComment(lootTableConfigComment);
-        if (!config.hasCategory(Constants.LOOT_TABLE_EASY_CATEGORY)) {
-        	configLootTable(config, Constants.LOOT_TABLE_EASY_CATEGORY, 51, Items.iron_ingot, 1, 3);
-        	configLootTable(config, Constants.LOOT_TABLE_EASY_CATEGORY, 101, Items.gold_ingot, 1, 3);
-        	configLootTable(config, Constants.LOOT_TABLE_EASY_CATEGORY, 201, Items.redstone, 1, 3);
-        	configLootTable(config, Constants.LOOT_TABLE_EASY_CATEGORY, 301, Items.glowstone_dust, 1, 3);
-        	configLootTable(config, Constants.LOOT_TABLE_EASY_CATEGORY, 501, Items.diamond, 1, 3);
+        configCategory.setComment(lootTableConfigComment);
+        if(!config.hasCategory(Constants.LOOT_TABLE_EASY_CATEGORY)) {
+            configLootTable(config, Constants.LOOT_TABLE_EASY_CATEGORY, 51, Items.iron_ingot, 1, 3);
+            configLootTable(config, Constants.LOOT_TABLE_EASY_CATEGORY, 101, Items.gold_ingot, 1, 3);
+            configLootTable(config, Constants.LOOT_TABLE_EASY_CATEGORY, 201, Items.redstone, 1, 3);
+            configLootTable(config, Constants.LOOT_TABLE_EASY_CATEGORY, 301, Items.glowstone_dust, 1, 3);
+            configLootTable(config, Constants.LOOT_TABLE_EASY_CATEGORY, 501, Items.diamond, 1, 3);
         }
         configCategory = config.getCategory(Constants.LOOT_TABLE_EASY_CATEGORY);
-    	configCategory.setComment(lootTableConfigComment);
-        
+        configCategory.setComment(lootTableConfigComment);
+
         config.save();// save the configuration file
 
         sanityCheckRewards(config);
-        
+
         blockMinesweeper = new BlockMinesweeper(Material.ground).setHardness(3.0F).setResistance(1.0F).setUnlocalizedName("minesweeperBlock");// .setCreativeTab(CreativeTabs.tabBlock);
 
         itemFieldGenerator = new ItemFieldGenerator().setCreativeTab(CreativeTabs.tabTools).setUnlocalizedName("fieldGenerator");
@@ -192,114 +192,112 @@ public class MinesweeperMod{
         //      TickRegistry.registerTickHandler(tickHandler, Side.SERVER);
         FMLCommonHandler.instance().bus().register(tickHandler);
         NetworkHandler.init();
-        
+
         gameRegisters();
         achievementRegisters();
     }
 
-    private void configLootTable(Configuration config, String category, int boardSize, Block block) {
-    	configLootTable(config, category, boardSize, block, 1, 1);
+    private void configLootTable(Configuration config, String category, int boardSize, Block block){
+        configLootTable(config, category, boardSize, block, 1, 1);
     }
-    
-    private void configLootTable(Configuration config, String category, int boardSize, Block block, int min, int max) {
-    	Item item = Item.getItemFromBlock(block);
-    	configLootTable(config, category, boardSize, item, 0, min, max);
+
+    private void configLootTable(Configuration config, String category, int boardSize, Block block, int min, int max){
+        Item item = Item.getItemFromBlock(block);
+        configLootTable(config, category, boardSize, item, 0, min, max);
     }
-    
-    private void configLootTable(Configuration config, String category, int boardSize, Item item) {
-    	configLootTable(config, category, boardSize, item, 0, 1, 1);
+
+    private void configLootTable(Configuration config, String category, int boardSize, Item item){
+        configLootTable(config, category, boardSize, item, 0, 1, 1);
     }
-    
-    private void configLootTable(Configuration config, String category, int boardSize, Item item, int min, int max) {
-    	configLootTable(config, category, boardSize, item, 0, min, max);
+
+    private void configLootTable(Configuration config, String category, int boardSize, Item item, int min, int max){
+        configLootTable(config, category, boardSize, item, 0, min, max);
     }
-    
-    private void configLootTable(Configuration config, String category, int boardSize, Item item, int meta, int min, int max) {
-    	String name = ((ResourceLocation)Item.itemRegistry.getNameForObject(item)).toString();
-    	config.get(category, String.valueOf(boardSize), new String[]{
-    			"1;" + name + ":" + meta + ":" + min + ":" + max
-    	});
+
+    private void configLootTable(Configuration config, String category, int boardSize, Item item, int meta, int min, int max){
+        String name = ((ResourceLocation)Item.itemRegistry.getNameForObject(item)).toString();
+        config.get(category, String.valueOf(boardSize), new String[]{"1;" + name + ":" + meta + ":" + min + ":" + max});
     }
-    
-    private void sanityCheckRewards(Configuration config) {
-    	sanityCheckRewardDifficulty(config, Constants.LOOT_TABLE_HARDCORE_CATEGORY);
-    	sanityCheckRewardDifficulty(config, Constants.LOOT_TABLE_HARD_CATEGORY);
-    	sanityCheckRewardDifficulty(config, Constants.LOOT_TABLE_NORMAL_CATEGORY);
-    	sanityCheckRewardDifficulty(config, Constants.LOOT_TABLE_EASY_CATEGORY);
+
+    private void sanityCheckRewards(Configuration config){
+        sanityCheckRewardDifficulty(config, Constants.LOOT_TABLE_HARDCORE_CATEGORY);
+        sanityCheckRewardDifficulty(config, Constants.LOOT_TABLE_HARD_CATEGORY);
+        sanityCheckRewardDifficulty(config, Constants.LOOT_TABLE_NORMAL_CATEGORY);
+        sanityCheckRewardDifficulty(config, Constants.LOOT_TABLE_EASY_CATEGORY);
     }
-    
-    private void sanityCheckRewardDifficulty(Configuration config, String difficulty) {
-    	ConfigCategory category = config.getCategory(difficulty);
-    	Map<String, Property> tiers = category.getValues();
-    	for (Entry<String, Property> tier : tiers.entrySet()) {
-    		try {
-    			Integer.parseInt(tier.getKey());
-    			sanityCheckRewardTier(difficulty, tier);
-    		} catch (NumberFormatException e) {
-    			StringBuilder sb = new StringBuilder();
-    			sb.append("Configuration error for {0}: Invalid reward tier ''{2}'' in ''{1}''. ");
-    			sb.append("The tier must be an integer value equal to or greater than zero");
-    			throw new RuntimeException(MessageFormat.format(sb.toString(), Constants.MOD_ID, difficulty, tier.getKey()), e);
-    		}
-    	}
+
+    private void sanityCheckRewardDifficulty(Configuration config, String difficulty){
+        ConfigCategory category = config.getCategory(difficulty);
+        Map<String, Property> tiers = category.getValues();
+        for(Entry<String, Property> tier : tiers.entrySet()) {
+            try {
+                Integer.parseInt(tier.getKey());
+                sanityCheckRewardTier(difficulty, tier);
+            } catch(NumberFormatException e) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Configuration error for {0}: Invalid reward tier ''{2}'' in ''{1}''. ");
+                sb.append("The tier must be an integer value equal to or greater than zero");
+                throw new RuntimeException(MessageFormat.format(sb.toString(), Constants.MOD_ID, difficulty, tier.getKey()), e);
+            }
+        }
     }
-    
-    private void sanityCheckRewardTier(String difficulty, Entry<String, Property> tier) {
-    	if (tier.getValue().getStringList().length == 0) {
-    		StringBuilder sb = new StringBuilder();
-    		sb.append("Configuration error for {0}: Missing rewards in tier ''{2}'' for ''{1}''. ");
-    		sb.append("Reward tiers need at least one reward, if you do not what a reward for a specified tier, remove the tier.");
-    		throw new RuntimeException(MessageFormat.format(sb.toString(), Constants.MOD_ID, difficulty, tier.getKey()));
-    	}
-    	Pattern rewardPattern = Pattern.compile("\\d+(;\\w+:\\w+:-?\\d+:\\d+:\\d+)+");
-    	for (String reward : tier.getValue().getStringList()) {
-    		if (!rewardPattern.matcher(reward).matches()) {
-    			StringBuilder sb = new StringBuilder();
-    			sb.append("Configuration error for {0}: Invalid reward definition ''{3}'' in tier ''{2}'' for ''{1}''. ");
-    			sb.append("The reward definition must have the following format: \n");
-    			sb.append("weight;mod_id:item_name:meta:min_stack_size:max_stack_size[;mod_id:item_name:meta:min_stack_size:max_stack_size[...]]");
-    			throw new RuntimeException(MessageFormat.format(sb.toString(), Constants.MOD_ID, difficulty, tier.getKey(), reward));
-    		}
-    		String[] rewardItems = reward.split(";");
-    		int weight = Integer.parseInt(rewardItems[0]);
-    		if (weight < 1) {
-    			StringBuilder sb = new StringBuilder();
-    			sb.append("Configuration error for {0}: Invalid reward weight for ''{3}'' in tier ''{2}'' for ''{1}''. ");
-    			sb.append("Weight must be greater than or equal to one.");
-    			throw new RuntimeException(MessageFormat.format(sb.toString(), Constants.MOD_ID, difficulty, tier.getKey(), reward));
-    		}
-    		for (int i = 1; i < rewardItems.length; i++) {
-    			sanityCheckRewardItem(difficulty, tier.getKey(), rewardItems[i]);
-    			
-    		}
-    	}
+
+    private void sanityCheckRewardTier(String difficulty, Entry<String, Property> tier){
+        if(tier.getValue().getStringList().length == 0) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Configuration error for {0}: Missing rewards in tier ''{2}'' for ''{1}''. ");
+            sb.append("Reward tiers need at least one reward, if you do not what a reward for a specified tier, remove the tier.");
+            throw new RuntimeException(MessageFormat.format(sb.toString(), Constants.MOD_ID, difficulty, tier.getKey()));
+        }
+        Pattern rewardPattern = Pattern.compile("\\d+(;\\w+:\\w+:-?\\d+:\\d+:\\d+)+");
+        for(String reward : tier.getValue().getStringList()) {
+            if(!rewardPattern.matcher(reward).matches()) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Configuration error for {0}: Invalid reward definition ''{3}'' in tier ''{2}'' for ''{1}''. ");
+                sb.append("The reward definition must have the following format: \n");
+                sb.append("weight;mod_id:item_name:meta:min_stack_size:max_stack_size[;mod_id:item_name:meta:min_stack_size:max_stack_size[...]]");
+                throw new RuntimeException(MessageFormat.format(sb.toString(), Constants.MOD_ID, difficulty, tier.getKey(), reward));
+            }
+            String[] rewardItems = reward.split(";");
+            int weight = Integer.parseInt(rewardItems[0]);
+            if(weight < 1) {
+                StringBuilder sb = new StringBuilder();
+                sb.append("Configuration error for {0}: Invalid reward weight for ''{3}'' in tier ''{2}'' for ''{1}''. ");
+                sb.append("Weight must be greater than or equal to one.");
+                throw new RuntimeException(MessageFormat.format(sb.toString(), Constants.MOD_ID, difficulty, tier.getKey(), reward));
+            }
+            for(int i = 1; i < rewardItems.length; i++) {
+                sanityCheckRewardItem(difficulty, tier.getKey(), rewardItems[i]);
+
+            }
+        }
     }
-    
-    private void sanityCheckRewardItem(String difficulty, String tier, String configItem) {
-    	RewardItem rewardItem = null;
-    	try {
-    		rewardItem = new RewardItem(configItem);
-    	} catch (Exception e) {
-    		StringBuilder sb = new StringBuilder();
-    		sb.append("Configuration error for {0}: Invalid item definition ''{3}'' in tier ''{2}'' for ''{1}''. ");
-    		sb.append("Item definitions must have the following format: \n");
-    		sb.append("mod_id:item_name:meta:min_stack_size:max_stack_size");
-    		throw new RuntimeException(MessageFormat.format(sb.toString(), Constants.MOD_ID, difficulty, tier, configItem), e);
-    	}
-    	Item item = GameRegistry.findItem(rewardItem.modId, rewardItem.itemName);
-		if (item == null) {
-			StringBuilder sb = new StringBuilder();
-			sb.append("Configuration error for {0}: Unknown item ''{3}:{4}'' in tier ''{2}'' for ''{1}''. ");
-			throw new RuntimeException(MessageFormat.format(sb.toString(), Constants.MOD_ID, difficulty, tier, rewardItem.modId, rewardItem.itemName));
-		}
-		if (rewardItem.min < 0 || rewardItem.min > rewardItem.max) {
-			StringBuilder sb = new StringBuilder();
-			sb.append("Configuration error for {0}: Invalid stack size range for ''{3}'' in tier ''{2}'' for ''{3}''. ");
-			sb.append("Minimum stack size must be equal to or greater than zero and equal to or less than max stack size");
-			throw new RuntimeException(MessageFormat.format(sb.toString(), Constants.MOD_ID, difficulty, tier, configItem, rewardItem.min));
-		}
+
+    private void sanityCheckRewardItem(String difficulty, String tier, String configItem){
+        RewardItem rewardItem = null;
+        try {
+            rewardItem = new RewardItem(configItem);
+        } catch(Exception e) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Configuration error for {0}: Invalid item definition ''{3}'' in tier ''{2}'' for ''{1}''. ");
+            sb.append("Item definitions must have the following format: \n");
+            sb.append("mod_id:item_name:meta:min_stack_size:max_stack_size");
+            throw new RuntimeException(MessageFormat.format(sb.toString(), Constants.MOD_ID, difficulty, tier, configItem), e);
+        }
+        Item item = GameRegistry.findItem(rewardItem.modId, rewardItem.itemName);
+        if(item == null) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Configuration error for {0}: Unknown item ''{3}:{4}'' in tier ''{2}'' for ''{1}''. ");
+            throw new RuntimeException(MessageFormat.format(sb.toString(), Constants.MOD_ID, difficulty, tier, rewardItem.modId, rewardItem.itemName));
+        }
+        if(rewardItem.min < 0 || rewardItem.min > rewardItem.max) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Configuration error for {0}: Invalid stack size range for ''{3}'' in tier ''{2}'' for ''{3}''. ");
+            sb.append("Minimum stack size must be equal to or greater than zero and equal to or less than max stack size");
+            throw new RuntimeException(MessageFormat.format(sb.toString(), Constants.MOD_ID, difficulty, tier, configItem, rewardItem.min));
+        }
     }
-    
+
     @EventHandler
     public void load(FMLInitializationEvent event){
         MinecraftForge.EVENT_BUS.register(new ForgeEventHandler());

@@ -1,4 +1,3 @@
-
 package minesweeperMod.common.network;
 
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -17,7 +16,7 @@ public class NetworkHandler{
      * The integer is the ID of the message, the Side is the side this message will be handled (received) on!
      */
     public static void init(){
-               INSTANCE.registerMessage(PacketSpawnParticle.class, PacketSpawnParticle.class, discriminant++, Side.CLIENT);
+        INSTANCE.registerMessage(PacketSpawnParticle.class, PacketSpawnParticle.class, discriminant++, Side.CLIENT);
     }
 
     /* public static void INSTANCE.registerMessage(Class<? extends AbstractPacket<? extends IMessage>> clazz){

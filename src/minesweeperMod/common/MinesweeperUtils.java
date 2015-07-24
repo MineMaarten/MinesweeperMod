@@ -13,8 +13,8 @@ import net.minecraft.stats.AchievementList;
  */
 
 public class MinesweeperUtils{
-   
-	/**
+
+    /**
      * 
      * @param name achieve.<unlocalizedName>. this means you shouldn't include the achieve.
      * @return

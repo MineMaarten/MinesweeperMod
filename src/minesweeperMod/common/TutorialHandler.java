@@ -201,9 +201,9 @@ public class TutorialHandler{
         }
         return true;
     }
-    
+
     private EnumState getState(int x, int y, int z){
-    	return BlockMinesweeper.getState(world.getBlockState(new BlockPos(x,y,z)));
+        return BlockMinesweeper.getState(world.getBlockState(new BlockPos(x, y, z)));
     }
 
     private boolean handleLevel1(){
