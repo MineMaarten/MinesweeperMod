@@ -4,8 +4,6 @@ import java.util.List;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -109,14 +107,13 @@ public class GuiAnimatedStat{
         GL11.glDisable(GL11.GL_TEXTURE_2D);
         GL11.glLineWidth(3.0F);
         GL11.glColor4d(0, 0, 0, 1);
-        WorldRenderer tess = Tessellator.getInstance().getWorldRenderer();
-        tess.startDrawing(GL11.GL_LINE_LOOP);
-        tess.addVertex(baseX, affectedY, zLevel);
-        tess.addVertex(baseX + width, affectedY, zLevel);
-        tess.addVertex(baseX + width, affectedY + height, zLevel);
-        tess.addVertex(baseX, affectedY + height, zLevel);
-        //tess.draw();
-        Tessellator.getInstance().draw();
+        GL11.glBegin(GL11.GL_LINE_LOOP);
+        GL11.glVertex3d(baseX, affectedY, zLevel);
+        GL11.glVertex3d(baseX, affectedY, zLevel);
+        GL11.glVertex3d(baseX + width, affectedY, zLevel);
+        GL11.glVertex3d(baseX + width, affectedY + height, zLevel);
+        GL11.glVertex3d(baseX, affectedY + height, zLevel);
+        GL11.glEnd();
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         if(leftSided) width *= -1;
         // if done expanding, draw the information

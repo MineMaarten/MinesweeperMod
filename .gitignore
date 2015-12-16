@@ -21,7 +21,9 @@ environment.properties
 .project
 /build
 /eclipse
+/gradle
 .gradle/
 .settings/
 /sounds
 gradle.properties
+gradlew.bat

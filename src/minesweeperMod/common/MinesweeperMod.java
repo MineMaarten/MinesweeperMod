@@ -15,7 +15,6 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.stats.Achievement;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraftforge.common.AchievementPage;
 import net.minecraftforge.common.ChestGenHooks;
@@ -215,7 +214,7 @@ public class MinesweeperMod{
     }
 
     private void configLootTable(Configuration config, String category, int boardSize, Item item, int meta, int min, int max){
-        String name = ((ResourceLocation)Item.itemRegistry.getNameForObject(item)).toString();
+        String name = Item.itemRegistry.getNameForObject(item).toString();
         config.get(category, String.valueOf(boardSize), new String[]{"1;" + name + ":" + meta + ":" + min + ":" + max});
     }
 
@@ -364,8 +363,8 @@ public class MinesweeperMod{
 
         Achievement[] achieveTilesCleared = new Achievement[5];
         Achievement[] achieveDifficultyCleared = new Achievement[4];
-        achieveTilesCleared[0] = new Achievement("achieveCleared1", "achieveCleared1", 0, -3, itemFieldGenerator, (Achievement)null).setIndependent();
-        achieveDifficultyCleared[0] = new Achievement("achieveDifficulty1", "achieveDifficulty1", -1, -1, itemFieldGenerator, (Achievement)null).setIndependent();
+        achieveTilesCleared[0] = new Achievement("achieveCleared1", "achieveCleared1", 0, -3, itemFieldGenerator, (Achievement)null).initIndependentStat();
+        achieveDifficultyCleared[0] = new Achievement("achieveDifficulty1", "achieveDifficulty1", -1, -1, itemFieldGenerator, (Achievement)null).initIndependentStat();
         for(int i = 1; i < 5; i++) {
             int meta;
             int xPosTiles;
@@ -400,8 +399,8 @@ public class MinesweeperMod{
                     meta = 8;
             }
 
-            achieveTilesCleared[i] = new Achievement("achieveCleared" + (i + 1), "achieveCleared" + (i + 1), xPosTiles, yPosTiles, new ItemStack(itemFieldGenerator, 1, meta), achieveTilesCleared[i - 1]).setIndependent();
-            if(i < 4) achieveDifficultyCleared[i] = new Achievement("achieveDifficulty" + (i + 1), "achieveDifficulty" + (i + 1), xPosDifficulty, yPosDifficulty, new ItemStack(itemFieldGenerator, 1, i), (Achievement)null).setIndependent();
+            achieveTilesCleared[i] = new Achievement("achieveCleared" + (i + 1), "achieveCleared" + (i + 1), xPosTiles, yPosTiles, new ItemStack(itemFieldGenerator, 1, meta), achieveTilesCleared[i - 1]).initIndependentStat();
+            if(i < 4) achieveDifficultyCleared[i] = new Achievement("achieveDifficulty" + (i + 1), "achieveDifficulty" + (i + 1), xPosDifficulty, yPosDifficulty, new ItemStack(itemFieldGenerator, 1, i), (Achievement)null).initIndependentStat();
 
         }
 
@@ -414,12 +413,12 @@ public class MinesweeperMod{
             allAchieves[i + achieveTilesCleared.length] = achieveDifficultyCleared[i];
         }
 
-        allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length] = new Achievement("achieveTutorial", "achieveTutorial", -5, -3, new ItemStack(itemFieldGenerator, 1, 100), (Achievement)null).setIndependent();
-        allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length + 1] = new Achievement("achieveAdvancedTutorial", "achieveAdvancedTutorial", -5, -1, new ItemStack(itemFieldGenerator, 1, 101), allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length]).setIndependent();
+        allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length] = new Achievement("achieveTutorial", "achieveTutorial", -5, -3, new ItemStack(itemFieldGenerator, 1, 100), (Achievement)null).initIndependentStat();
+        allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length + 1] = new Achievement("achieveAdvancedTutorial", "achieveAdvancedTutorial", -5, -1, new ItemStack(itemFieldGenerator, 1, 101), allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length]).initIndependentStat();
 
-        allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length + 2] = new Achievement("achieveUseDetector", "achieveUseDetector", -5, 2, itemMineDetector, (Achievement)null).setIndependent();
-        allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length + 3] = new Achievement("achieve8", "achieve8", 5, -3, new ItemStack(blockMinesweeper, 1, 8), (Achievement)null).setSpecial().setIndependent();
-        allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length + 4] = new Achievement("achieve7", "achieve7", 5, -1, new ItemStack(blockMinesweeper, 1, 7), (Achievement)null).setSpecial().setIndependent();
+        allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length + 2] = new Achievement("achieveUseDetector", "achieveUseDetector", -5, 2, itemMineDetector, (Achievement)null).initIndependentStat();
+        allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length + 3] = new Achievement("achieve8", "achieve8", 5, -3, new ItemStack(blockMinesweeper, 1, 8), (Achievement)null).setSpecial().initIndependentStat();
+        allAchieves[achieveTilesCleared.length + achieveDifficultyCleared.length + 4] = new Achievement("achieve7", "achieve7", 5, -1, new ItemStack(blockMinesweeper, 1, 7), (Achievement)null).setSpecial().initIndependentStat();
 
         for(Achievement achieve : allAchieves) {
             achieve.registerStat();
